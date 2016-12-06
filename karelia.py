@@ -4,12 +4,6 @@
 #   Karelia library, by PouncySilverkitten                  #
 #   github.com/PouncySilverkitten/karelia                   #
 #                                                           #
-#   Functions                                               #
-#   - connectTo(room)                                       #
-#   - disconnect(websocketObject)                           #
-#   - parse(message)                                        #
-#   - changeNick(newNick)                                   #
-#   - spoof(message)                                        #
 #############################################################
 
 from websocket import create_connection
@@ -19,8 +13,10 @@ botName = ""
 startTime = time.time()
 startDate = time.strftime("%Y-%m-%d %H:%M:%S")
 paused = False
-shortHelp = helpMessage = ["This bot has not had a help message specified. This message was generated automatically."]
+shortHelp = "This bot has not had a help message specified."
+helpMessage = ["This bot has not had a help message specified. This message was generated automatically by the karelia.py library."]
 room = ""
+lastMessage = ""
 
 def changeNick(nick):
     global room
@@ -65,58 +61,63 @@ def connectTo(roomName):
 def disconnect(room):
     room.close()
 
-def parse(incoming):
+def parse():
     global room
     global paused
     global botName
+    global lastMessage
 
     try:
+        incoming = room.recv()
+        
+        if lastMessage != incoming:
+            lastMessage = incoming
 
-        packet = json.loads(incoming)
+            packet = json.loads(incoming)
 
-        if packet["type"] == "ping-event":
-            room.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
+            if packet["type"] == "ping-event":
+                room.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
 
-        elif packet['type'] == "send-event":
-            
-            if packet['data']['content'] == '!ping':
-                send('Pong!', packet['data']['id'])
-            elif packet['data']['content'] == '!ping @' + botName:
-                send('Pong!',packet['data']['id']) 
-     
-            elif packet['data']['content'] == '!uptime @' + botName:
-                uptime = getUptime()
-                send('/me has been up since ' + uptime,packet['data']['id'])
-
-            elif packet['data']['content'] == '!pause @' + botName:
-                send('/me has been paused',packet['data']['id'])
-                paused = True
-            elif packet['data']['content'] == '!unpause @' + botName:
-                paused = False
-                send('/me has been unpaused',packet['data']['id'])
+            elif packet['type'] == "send-event":
                 
-            elif packet['data']['content'] == '!help @' + botName:
-                for message in helpMessage:
-                    sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
-                    send(sending,packet['data']['id'])
-            elif packet['data']['content'] == '!help':
-                send(shortHelp,packet['data']['id'])
+                if packet['data']['content'] == '!ping':
+                    send('Pong!', packet['data']['id'])
+                elif packet['data']['content'] == '!ping @' + botName:
+                    send('Pong!',packet['data']['id']) 
+         
+                elif packet['data']['content'] == '!uptime @' + botName:
+                    uptime = getUptime()
+                    send('/me has been up since ' + uptime,packet['data']['id'])
 
-            elif packet['data']['content'] == "!kill @" + botName:
-                send("Bot killed; will now exit.",packet['data']['id'])
-                sys.exit()
-
-            elif packet['data']['content'] == "!antighost":
-                changeNick(botName)
+                elif packet['data']['content'] == '!pause @' + botName:
+                    send('/me has been paused',packet['data']['id'])
+                    paused = True
+                elif packet['data']['content'] == '!unpause @' + botName:
+                    paused = False
+                    send('/me has been unpaused',packet['data']['id'])
                     
-            else:
-                return(packet)
+                elif packet['data']['content'] == '!help @' + botName:
+                    for message in helpMessage:
+                        sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
+                        send(sending,packet['data']['id'])
+                elif packet['data']['content'] == '!help':
+                    send(shortHelp,packet['data']['id'])
 
-        handleType = ""
-        if packet["type"] == "ping-event":
-            handleType = "ping"
-            
-        return(json.loads(json.dumps({"type": "handled", 'class': handleType})))
+                elif packet['data']['content'] == "!kill @" + botName:
+                    send("Bot killed; will now exit.",packet['data']['id'])
+                    sys.exit()
+
+                elif packet['data']['content'] == "!antighost":
+                    changeNick(botName)
+                        
+                else:
+                    return(packet)
+
+            handleType = ""
+            if packet["type"] == "ping-event":
+                handleType = "ping"
+                
+            return(json.loads(json.dumps({"type": "handled", 'class': handleType})))
         
     except Exception as e:
         print("Parsing error from karelia.py: " + str(e))
