@@ -4,7 +4,7 @@
 karelia.py is a simple library for connecting Python bots to `euphoria.io`. It consists entirely of functions which handle all of the websocket- and json-related tasks required to stay connected. The rest, dear coder, is up to you.
 
 ##Dependencies
-karelia.py requires **Python 3** and the *websocket-client** library. It also calls json, time, and sys.
+karelia.py requires **Python 3** and the *websocket-client* library. It also calls json, time, and sys.
 
 ##Use
 At present, karelia.py is composed entirely of functions. For real-world reference, see template.py.
