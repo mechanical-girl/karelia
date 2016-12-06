@@ -13,19 +13,18 @@
 #############################################################
 
 from websocket import create_connection
-import json
-import time
-import sys
+import json, time, sys
 
 botName = ""
 startTime = time.time()
 startDate = time.strftime("%Y-%m-%d %H:%M:%S")
 paused = False
-helpMessage = ["This bot has not had a help message specified. This message was generated automatically."]
+shortHelp = helpMessage = ["This bot has not had a help message specified. This message was generated automatically."]
+room = ""
 
 def changeNick(nick):
-    global ws
-    ws.send(json.dumps({"type": "nick","data": {"name":nick}}))
+    global room
+    room.send(json.dumps({"type": "nick","data": {"name":nick}}))
 
 def getUptime():
     global startTime
@@ -52,23 +51,22 @@ def getUptime():
 
 def send(message,parent=''):
     global paused
-    global ws
+    global room
     if not paused:
-        ws.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
+        room.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
     
-def connectTo(room):
-    global ws
+def connectTo(roomName):
+    global room
     global botName
-    ws = create_connection("wss://euphoria.io/room/"+room+"/ws")
-    ws.send(json.dumps({"type": "nick","data": {"name":botName}}))
-    return(ws)
+    room = create_connection("wss://euphoria.io/room/"+roomName+"/ws")
+    room.send(json.dumps({"type": "nick","data": {"name":botName}}))
+    return(room)
 
 def disconnect(room):
     room.close()
 
-
 def parse(incoming):
-    global ws
+    global room
     global paused
     global botName
 
@@ -77,37 +75,84 @@ def parse(incoming):
         packet = json.loads(incoming)
 
         if packet["type"] == "ping-event":
-            ws.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
+            room.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
 
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!ping':
-            send('Pong!',packet['data']['id'])
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!ping @' + botName:
-            send('Pong!',packet['data']['id']) 
+        elif packet['type'] == "send-event":
             
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!uptime':
-            uptime = getUptime()
-            send('/me has been up since ' + uptime,packet['data']['id'])      
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!uptime @' + botName:
+            if packet['data']['content'] == '!ping':
+                send('Pong!', packet['data']['id'])
+            elif packet['data']['content'] == '!ping @' + botName:
+                send('Pong!',packet['data']['id']) 
+     
+            elif packet['data']['content'] == '!uptime @' + botName:
+                uptime = getUptime()
+                send('/me has been up since ' + uptime,packet['data']['id'])
+
+            elif packet['data']['content'] == '!pause @' + botName:
+                send('/me has been paused',packet['data']['id'])
+                paused = True
+            elif packet['data']['content'] == '!unpause @' + botName:
+                paused = False
+                send('/me has been unpaused',packet['data']['id'])
+                
+            elif packet['data']['content'] == '!help @' + botName:
+                for message in helpMessage:
+                    sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
+                    send(sending,packet['data']['id'])
+            elif packet['data']['content'] == '!help':
+                send(shortHelp,packet['data']['id'])
+
+            elif packet['data']['content'] == "!kill @" + botName:
+                send("Bot killed; will now exit.",packet['data']['id'])
+                sys.exit()
+
+            elif packet['data']['content'] == "!antighost":
+                changeNick(botName)
+                    
+            else:
+                return(packet)
+
+        handleType = ""
+        if packet["type"] == "ping-event":
+            handleType = "ping"
+            
+        return(json.loads(json.dumps({"type": "handled", 'class': handleType})))
+        
+    except Exception as e:
+        print("Parsing error from karelia.py: " + str(e))
+        return(json.dumps({"type": "error",'error':str(e)}))
+
+def spoof(packet,spoofBot):
+    global room
+    global paused
+
+    try:
+
+        if packet['data']['content'] == '!ping @' + spoofBot:
+            send('Pong!',packet['data']['id']) 
+ 
+        elif packet['data']['content'] == '!uptime @' + spoofBot:
             uptime = getUptime()
             send('/me has been up since ' + uptime,packet['data']['id'])
 
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!pause @' + botName:
+        elif packet['data']['content'] == '!pause @' + spoofBot:
             send('/me has been paused',packet['data']['id'])
             paused = True
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!unpause @' + botName:
+        elif packet['data']['content'] == '!unpause @' + spoofBot:
             paused = False
             send('/me has been unpaused',packet['data']['id'])
             
-        elif packet['type'] == "send-event" and packet['data']['content'] == '!help @' + botName:
+        elif packet['data']['content'] == '!help @' + spoofBot:
             for message in helpMessage:
                 sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
                 send(sending,packet['data']['id'])
 
-        elif packet['type'] == "send-event" and packet['data']['content'] == "!kill @" + botName:
-            send("Bot killed; will now exit.")
+        elif packet['data']['content'] == "!kill @" + spoofBot:
+            send("Bot killed; will now exit.",packet['data']['id'])
+            sys.exit()
                 
         else:
-             return(packet)
+            return(packet)
 
         if packet["type"] == "ping-event":
             handleType = "ping"
@@ -116,42 +161,6 @@ def parse(incoming):
             
         return(json.loads(json.dumps({"type": "handled", 'class':handleType})))
         
-    except Exception as error:
-        print("Parsing error from karelia.py: " + str(error))
-        return(json.dumps({"type": "error"}))
-
-def spoof(packet):
-    global ws
-    global paused
-    global botName
-
-    try:
-
-        if packet['type'] == "send-event" and '!ping' in packet['data']['content']:
-            send('Pong!',packet['data']['id']) 
-            
-        elif packet['type'] == "send-event" and '!uptime' in packet['data']['content']:
-            uptime = getUptime()
-            send('/me has been up since ' + uptime,packet['data']['id'])      
-
-        elif packet['type'] == "send-event" and '!pause' in packet['data']['content']:
-            send('/me has been paused',packet['data']['id'])
-            paused = True
-        elif packet['type'] == "send-event" and '!unpause' in packet['data']['content']:
-            paused = False
-            send('/me has been unpaused',packet['data']['id'])
-            
-        elif packet['type'] == "send-event" and  '!help' in packet['data']['content']:
-            for message in helpMessage:
-                sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
-                send(sending,packet['data']['id'])
-
-        elif packet['type'] == "send-event" and  "!kill" in packet['data']['content']:
-            send("Bot killed; will now exit.")
-                
-        else:
-             return(json.dumps({'type':'failure','cause':'packet contents not spoofable'}))
-            
-    except Exception as error:
-        print("Spoofing error from karelia.py: " + str(error))
-        return(json.loads(json.dumps({"type": "error"})))
+    except Exception as e:
+        print("Spoofing error from karelia.py: " + str(e))
+        return(json.dumps({"type": "error",'error':str(e)}))
