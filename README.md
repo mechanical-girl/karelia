@@ -23,6 +23,7 @@ This function will connect to the websocket of the room specified in string form
 
 ###karelia.parse()
 Accepting no arguments, the parse() function instead waits until a new message arrives from the websocket connection. It then handles said message thus:
+
 1. Convert to a dict.
 2. If it is a ping:
   1. Respond.
