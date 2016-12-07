@@ -25,11 +25,9 @@ This function will connect to the websocket of the room specified in string form
 Accepting no arguments, the parse() function instead waits until a new message arrives from the websocket connection. It then handles said message thus:
 
 1. Convert to a dict.
-2. If it is a ping:
-  1. Respond.
-  2. Return dict where dict['type'] is "handled" and dict['class'] = "ping-event"
-3. If it is a bang command with a response specified in the Euphorian Bot Standards or '!antighost', respond.
-4. Otherwise, return the dict object.
+2. If it is a ping, respond.
+   If it is a bang command with a response specified in the Euphorian Bot Standards or '!antighost', respond.
+4. Return the dict object.
 
 If the parse() function encounters an error, it will return a dict with content dict['type'] == "error" and dict['error'] == the exception thrown.
 
