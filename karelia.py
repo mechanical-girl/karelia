@@ -109,15 +109,8 @@ def parse():
 
                 elif packet['data']['content'] == "!antighost":
                     changeNick(botName)
-                        
-                else:
-                    return(packet)
 
-            handleType = ""
-            if packet["type"] == "ping-event":
-                handleType = "ping"
-                
-            return(json.loads(json.dumps({"type": "handled", 'class': handleType})))
+            return(packet)
         
     except Exception as e:
         print("Parsing error from karelia.py: " + str(e))
@@ -151,16 +144,8 @@ def spoof(packet,spoofBot):
         elif packet['data']['content'] == "!kill @" + spoofBot:
             send("Bot killed; will now exit.",packet['data']['id'])
             sys.exit()
-                
-        else:
-            return(packet)
 
-        if packet["type"] == "ping-event":
-            handleType = "ping"
-        else:
-            handleType = str(packet['data']['content'].split()[0][1:])
-            
-        return(json.loads(json.dumps({"type": "handled", 'class':handleType})))
+        return(packet)
         
     except Exception as e:
         print("Spoofing error from karelia.py: " + str(e))
