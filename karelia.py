@@ -45,10 +45,13 @@ def getUptime():
     uptime = startDate + " (" + str(updays) + " days " + str(uphours) + " hours " + str(upminutes) + " minutes)"
     return uptime
 
-def send(message,parent=''):
+def send(message,parent='',packet=False):
     global paused
     global room
+    global packet
     if not paused:
+        if packet != False:
+            message = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
         room.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
     
 def connectTo(roomName):
@@ -138,8 +141,7 @@ def spoof(packet,spoofBot):
             
         elif packet['data']['content'] == '!help @' + spoofBot:
             for message in helpMessage:
-                sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
-                send(sending,packet['data']['id'])
+                send(message,packet['data']['id'])
 
         elif packet['data']['content'] == "!kill @" + spoofBot:
             send("Bot killed; will now exit.",packet['data']['id'])
