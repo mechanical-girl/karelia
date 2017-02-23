@@ -18,9 +18,10 @@ helpMessage = ["This bot has not had a help message specified. This message was 
 room = ""
 lastMessage = ""
 
-def changeNick(nick):
+def changeNick(nick = botName):
     global room
     room.send(json.dumps({"type": "nick","data": {"name":nick}}))
+    botName = nick
 
 def getUptime():
     global startTime
@@ -48,7 +49,6 @@ def getUptime():
 def send(message,parent='',packet=False):
     global paused
     global room
-    global packet
     if not paused:
         if packet != False:
             message = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
@@ -61,8 +61,8 @@ def connectTo(roomName):
     room.send(json.dumps({"type": "nick","data": {"name":botName}}))
     return(room)
 
-def disconnect(room):
-    room.close()
+def disconnect(conn):
+    conn.close()
 
 def parse():
     global room
