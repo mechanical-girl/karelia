@@ -13,14 +13,15 @@ botName = ""
 startTime = time.time()
 startDate = time.strftime("%Y-%m-%d %H:%M:%S")
 paused = False
-shortHelp = "This bot has not had a help message specified."
-helpMessage = ["This bot has not had a help message specified. This message was generated automatically by the karelia.py library."]
 room = ""
 lastMessage = ""
+conn = None
 
-def changeNick(nick = botName):
-    global room
-    room.send(json.dumps({"type": "nick","data": {"name":nick}}))
+class KareliaException(Exception):
+    pass
+
+def changeNick(nick=botName):
+    conn.send(json.dumps({"type": "nick","data": {"name":nick}}))
     botName = nick
 
 def getUptime():
@@ -47,31 +48,31 @@ def getUptime():
     return uptime
 
 def send(message,parent='',packet=False):
-    global paused
-    global room
     if not paused:
-        if packet != False:
-            message = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
-        room.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
+        if packet != False and len(message) > 0:
+            message = message.replace('***sender**','@' + packet['data']['sender']['name'].replace(' ',''))
+        conn.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
     
 def connectTo(roomName):
-    global room
-    global botName
-    room = create_connection("wss://euphoria.io/room/"+roomName+"/ws")
-    room.send(json.dumps({"type": "nick","data": {"name":botName}}))
-    return(room)
+    global conn
+    conn = create_connection("wss://euphoria.io/room/"+roomName+"/ws")
+    conn.send(json.dumps({"type": "nick","data": {"name":botName}}))
+    return(conn)
 
 def disconnect(conn):
-    conn.close()
+    try:
+        conn.close()
+    finally:
+        return()
 
-def parse():
-    global room
+def parse(packet = False, name=False):
     global paused
-    global botName
     global lastMessage
+    if name == False:
+        name = botName
 
     try:
-        incoming = room.recv()
+        incoming = conn.recv()
         
         if lastMessage != incoming:
             lastMessage = incoming
@@ -79,76 +80,47 @@ def parse():
             packet = json.loads(incoming)
 
             if packet["type"] == "ping-event":
-                room.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
+                conn.send(json.dumps({'type': 'ping-reply', 'data': {'time': packet['data']['time']}}))
 
             elif packet['type'] == "send-event":
                 
                 if packet['data']['content'] == '!ping':
                     send('Pong!', packet['data']['id'])
-                elif packet['data']['content'] == '!ping @' + botName:
+                if packet['data']['content'] == '!ping @{0}'.format(name):
                     send('Pong!',packet['data']['id']) 
          
-                elif packet['data']['content'] == '!uptime @' + botName:
+                if packet['data']['content'] == '!uptime @{0}'.format(name):
                     uptime = getUptime()
                     send('/me has been up since ' + uptime,packet['data']['id'])
 
-                elif packet['data']['content'] == '!pause @' + botName:
+                if packet['data']['content'] == '!pause @{0}'.format(name):
                     send('/me has been paused',packet['data']['id'])
                     paused = True
-                elif packet['data']['content'] == '!unpause @' + botName:
+                if packet['data']['content'] == '!unpause @{0}'.format(name):
                     paused = False
                     send('/me has been unpaused',packet['data']['id'])
                     
-                elif packet['data']['content'] == '!help @' + botName:
+                if packet['data']['content'] == '!help @{0}'.format(name):
                     for message in helpMessage:
                         sending = message.replace('**sender**','@' + packet['data']['sender']['name'].replace(' ',''))
                         send(sending,packet['data']['id'])
-                elif packet['data']['content'] == '!help':
+                if packet['data']['content'] == '!help':
                     send(shortHelp,packet['data']['id'])
 
-                elif packet['data']['content'] == "!kill @" + botName:
+                if packet['data']['content'] == '!kill @{0}'.format(name):
                     send("Bot killed; will now exit.",packet['data']['id'])
-                    sys.exit()
+                    return(sys.exit())
 
-                elif packet['data']['content'] == "!antighost":
+                if packet['data']['content'] == "!antighost":
                     changeNick(botName)
 
             return(packet)
         
     except Exception as e:
-        print("Parsing error from karelia.py: " + str(e))
-        return(json.dumps({"type": "error",'error':str(e)}))
+        raise KareliaException({'message':'There was an error parsing the message','error':e})
 
 def spoof(packet,spoofBot):
-    global room
-    global paused
-
-    try:
-
-        if packet['data']['content'] == '!ping @' + spoofBot:
-            send('Pong!',packet['data']['id']) 
- 
-        elif packet['data']['content'] == '!uptime @' + spoofBot:
-            uptime = getUptime()
-            send('/me has been up since ' + uptime,packet['data']['id'])
-
-        elif packet['data']['content'] == '!pause @' + spoofBot:
-            send('/me has been paused',packet['data']['id'])
-            paused = True
-        elif packet['data']['content'] == '!unpause @' + spoofBot:
-            paused = False
-            send('/me has been unpaused',packet['data']['id'])
-            
-        elif packet['data']['content'] == '!help @' + spoofBot:
-            for message in helpMessage:
-                send(message,packet['data']['id'])
-
-        elif packet['data']['content'] == "!kill @" + spoofBot:
-            send("Bot killed; will now exit.",packet['data']['id'])
-            sys.exit()
-
-        return(packet)
-        
+    try: parse(packet,spoofBot)      
     except Exception as e:
         print("Spoofing error from karelia.py: " + str(e))
-        return(json.dumps({"type": "error",'error':str(e)}))
+        return({"type": "error",'error':str(e)})
