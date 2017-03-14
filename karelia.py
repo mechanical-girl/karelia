@@ -6,8 +6,9 @@
 #                                                           #
 #############################################################
 
+import websocket
 from websocket import create_connection
-import json, time, sys
+import json, time, sys, os
 
 botName = ""
 startTime = time.time()
@@ -16,6 +17,7 @@ paused = False
 room = ""
 lastMessage = ""
 conn = None
+room = ""
 
 class KareliaException(Exception):
     pass
@@ -54,7 +56,8 @@ def send(message,parent='',packet=False):
         conn.send(json.dumps({'type': 'send', 'data': {'content': message, 'parent': parent}}))
     
 def connectTo(roomName):
-    global conn
+    global conn, room
+    room = roomName
     conn = create_connection("wss://euphoria.io/room/"+roomName+"/ws")
     conn.send(json.dumps({"type": "nick","data": {"name":botName}}))
     return(conn)
@@ -124,3 +127,11 @@ def spoof(packet,spoofBot):
     except Exception as e:
         print("Spoofing error from karelia.py: " + str(e))
         return({"type": "error",'error':str(e)})
+
+def log(e, message = ''):
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    exception = "Exception on message: {}\n{}: {}\n  {}\n  {}\n  {} at line {}\n\n".format(message['data'], type(e), e, exc_type, exc_obj, fname, exc_tb.tb_lineno)
+    with open("{} &{}.log".format(botName, room), 'a') as f:
+        f.write(exception)
+    print(exception)
