@@ -3,7 +3,8 @@ karelia
  Karelia is a library of functions for connecting a bot to the Heim chat platform at euphoria.io                                               
 
 Syntax
-------### changeNick
+------
+### changeNick
 changeNick sents the nick command to Heim servers.
 
     If a nick is passed in as an argument, it will change to that and change
