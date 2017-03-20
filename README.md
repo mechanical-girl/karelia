@@ -8,7 +8,7 @@ Syntax
 ### changeNick
 ` changeNick(nick = botName)
     `: 
-changeNick sents the nick command to Heim servers.
+changeNick sends the nick command to Heim servers.
 
 If a nick is passed in as an argument, it will change to that and change
 the botName variable to the value passed as an argument (for resilience
