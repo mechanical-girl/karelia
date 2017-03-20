@@ -5,18 +5,21 @@ platform at euphoria.io
 
 Syntax
 ------
-### changeNick
+### changeNick(nick=botName):
+    
 changeNick sents the nick command to Heim servers.
 
 If a nick is passed in as an argument, it will change to that and change
 the botName variable to the value passed as an argument (for resilience
-against `!antighost`, amongst other reasons. If no nick is specified, it
+against `!antighost`, amongst other reasons). If no nick is specified, it
 will assume that the `botName` variable is the desired nick.
 
-### getUptime
+### getUptime():
+    
 Called by the `!uptime` command. Returns time since connect as string.
 
-### send
+### send(message,parent='',packet=False):
+    
 Sends the supplied message. The parent message can be specified.
 
 Arguments are: the message to be sent, the id of the parent message, the
@@ -37,13 +40,16 @@ a reply to the message with id `02aa8y85m7hts`.
 `karelia.send({'type': 'log', 'data': {'n':1000}}, True)` will send a log
 request for the thousand most recent messages posted to the room.
 
-### connectTo
+### connectTo(roomName):
+    
 Connects to specified room and sets nick. Returns a connection object.
 
-### disconnect
+### disconnect(conn):
+    
 Attempts to close the connection passed to it.
 
-### parse
+### parse(packet = False, name=False):
+    
 parse() handles the commands specified in the Botrulez
 (github.com/jedevc/botrulez) and those required to stay alive.
 
@@ -59,13 +65,15 @@ error occurs, it will return an exception.
 
 Note: as of 2017-03-16 if killed, it will return sys.exit().
 
-### spoof
+### spoof(packet,spoofBot):
+    
 spoof() takes two arguments (packet and spoofBot)
 
 Calling spoof(packet, spoofBot) causes karelia to respond to the packet
 offered as though it were named spoofBot.
 
-### log
+### log(error = '', message = ''):
+    
 logs as much information as possible to an external file.
 
 log should be passed an exception object and if possible the message being
