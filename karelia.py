@@ -6,7 +6,6 @@
 #                                                           #
 #############################################################
 
-import websocket
 from websocket import create_connection
 import json, time, sys, os
 
