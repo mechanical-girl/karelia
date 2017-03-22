@@ -5,9 +5,25 @@ platform at euphoria.io
 
 Syntax
 ------
+### KareliaException
+`KareliaException(Exception)`: 
+Generic exception from the library.
+
+### newBot
+`newBot()`: 
+This class represents a single bot connected to the Heim servers.
+
+For simple usecases, a single call to newBot will suffice. This will be in
+circumstances where only one bot is required, and will only be required to
+connect to one room at a time.
+
+For more complex implementations, the botCommand class may be required,
+which will negate the need to call newBot manually. For more information,
+see the botCommand docs.
+
 ### __init__
-`__init__(self, name, room)`: 
-Automatically called on creation.
+`__init__(self, name, room, botCommand = False)`: 
+Automatically called on creation. Do not set botCommand True.
 
 ### connect
 `connect(self, stealth=False)`: 
