@@ -7,12 +7,12 @@ Syntax
 ======
 KareliaException
 ------
-`*KareliaException(Exception)`: 
+
 Generic exception from the library.
 
 newBot
 ------
-`*newBot()`: 
+
 This class represents a single bot connected to the Heim servers.
 
 For simple usecases, a single call to newBot will suffice. This will be in
