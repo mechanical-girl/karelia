@@ -15,12 +15,14 @@ import traceback
 
 
 class KareliaException(Exception):
+    """Generic exception from the library."""
     pass
 
 
 class newBot():
 
     def __init__(self, name, room):
+        """Automatically called on creation."""
         if type(name) == "<class 'list'>":
             self.names = name
         else:
@@ -35,7 +37,7 @@ class newBot():
             range(0x10000, sys.maxunicode + 1), 0xfffd)
 
     def connect(self, stealth=False):
-        """Connects to specified room and sets nick."""
+        """Connects to specified room and sets nick from names[0]."""
         self.conn = create_connection(
             "wss://euphoria.io/room/{}/ws".format(self.room))
         if not stealth:
@@ -48,7 +50,7 @@ class newBot():
         If a nick is passed in as an argument, it will change to that and change
         the `botName` variable to the value passed as an argument (for resilience
         against `!antighost`, amongst other reasons). If no nick is specified, it
-        will assume that the `botName` variable is the desired nick.
+        will assume that the string at `name[0]` variable is the desired nick.
         """
         if nick == '':
             nick = self.names[0]
@@ -74,7 +76,7 @@ class newBot():
             self.upticks -= 60
 
         self.uptime = "/me has been up since {} UTC ({} days, {} hours, {} minutes)".format(
-            time.strftime("%a, %d %b %Y %H:%M:%S (%Z)", self.connectTime),
+            time.strftime("%a, %d %b %Y %H:%M:%S", self.connectTime),
             self.updays,
             self.uphours,
             self.upminutes,
@@ -82,7 +84,7 @@ class newBot():
         )
         return(self.uptime)
 
-    def send(self, message, parent='', packet=False):
+    def send(self, message, parent=''):
         """
         Sends the supplied message. The parent message can be specified.
 
@@ -90,22 +92,22 @@ class newBot():
         packet being replied to, and whether or not message is a complete packet.
 
         - message:  either a complete packet, or the `['data']['content']` field
-        of one. If the former, the packet argument must be set to true.
+        of one. If the former - i.e. `type(message) == "<class 'dict'>"` - the
+        `message` variable will be sent unaltered. Otherwise, it will be sent as
+        the value of the 'content' field of a message with `type` 'send'.
         - parent:   the id of the message being replied to. If not specified,
         karelia will send the message as a new parent i.e. bottom-level message.
-        - packet:   if set to `True`, the first argument will be treated as a
-        complete packet.
 
         `karelia.send('Top-level message')` will send that as a top-level message.
 
         `karelia.send('It's a reply!','02aa8y85m7hts')` will send that message as
         a reply to the message with id `02aa8y85m7hts`.
 
-        `karelia.send({'type': 'log', 'data': {'n':1000}}, True)` will send a log
+        `karelia.send({'type': 'log', 'data': {'n':1000}})` will send a log
         request for the thousand most recent messages posted to the room.
         """
         if not self.paused:
-            if packet == True and len(message) > 0:
+            if type(message) == "<class 'dict'>" and len(message) > 0:
                 self.conn.send(message)
             else:
                 self.conn.send(json.dumps({'type': 'send',
