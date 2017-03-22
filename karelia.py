@@ -199,7 +199,7 @@ class newBot():
         """Return the known-standard form of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
-    def log(e):
+    def log():
         """
         logs as much information as possible to an external file.
 
@@ -207,13 +207,10 @@ class newBot():
         processed at the time of the exception. It will then write out as much as
         it can about the exception to a logfile.
         """
-        try:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            message = "Exception on message: {}\n{}: {}\n  {}\n  {}\n  {} at line {}\n\n".format(
-                self.packet['data'], type(e), e, exc_type, exc_obj, fname, exc_tb.tb_lineno)
-        except:
-            message = e
+        logMessage = "{}: Exception on message:\n{}\n\nException was:\n{}".format(
+            time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+            self.packet['data'],
+            traceback.format_exc())
         with open("{} &{}.log".format(self.name[0], self.room), 'a') as f:
-            f.write(exception)
-        print(exception)
+            f.write(logMessage)
+        print(logMessage)
