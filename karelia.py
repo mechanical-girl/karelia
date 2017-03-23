@@ -6,34 +6,36 @@ platform at euphoria.io
 """
 
 from websocket import create_connection
+import traceback
 import json
 import time
 import sys
 import os
 import re
-import traceback
 
 
 class KareliaException(Exception):
-    """Generic exception from the library."""
+    """Generic exception"""
     pass
 
 
 class newBot():
+    """newBot represents a single bot for euphoria.io
+
+    A single bot is the simplest object which Karelia supports. Simply speaking,
+    a bot object is a collection of functions which, when used correctly, are
+    capable of maintaining and utilising a two-way connection between itself and
+    the Heim servers at euphoria.io.
+
+    To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
+    which will return a bot object.
+
+    A bot object has the following functions:
+    - `connect` connects to the room specified on creation
     """
-    This class represents a single bot connected to the Heim servers.
 
-    For simple usecases, a single call to newBot will suffice. This will be in
-    circumstances where only one bot is required, and will only be required to
-    connect to one room at a time.
-
-    For more complex implementations, the botCommand class may be required,
-    which will negate the need to call newBot manually. For more information,
-    see the botCommand docs.
-    """
-
-    def __init__(self, name, room, botCommand = False):
-        """Automatically called on creation. Do not set botCommand True."""
+    def __init__(self, name, room):
+        """Inits the bot object"""
         if type(name) == "<class 'list'>":
             self.names = name
         else:
@@ -48,7 +50,7 @@ class newBot():
             range(0x10000, sys.maxunicode + 1), 0xfffd)
 
     def connect(self, stealth=False):
-        """Connects to specified room and sets nick from names[0]."""
+        """Connects to specified room and sets nick."""
         self.conn = create_connection(
             "wss://euphoria.io/room/{}/ws".format(self.room))
         if not stealth:
@@ -61,12 +63,12 @@ class newBot():
         If a nick is passed in as an argument, it will change to that and change
         the `botName` variable to the value passed as an argument (for resilience
         against `!antighost`, amongst other reasons). If no nick is specified, it
-        will assume that the string at `name[0]` variable is the desired nick.
+        will assume that the `botName` variable is the desired nick.
         """
         if nick == '':
             nick = self.names[0]
         self.conn.send(json.dumps(
-            {"type": "nick", "data": {"name": self.names[0]}}))
+            {"type": "nick", "data": {"name": nick}}))
 
     def getUptime(self):
         """Called by the `!uptime` command. Returns time since connect as string."""
@@ -87,7 +89,7 @@ class newBot():
             self.upticks -= 60
 
         self.uptime = "/me has been up since {} UTC ({} days, {} hours, {} minutes)".format(
-            time.strftime("%a, %d %b %Y %H:%M:%S", self.connectTime),
+            time.strftime("%a, %d %b %Y %H:%M:%S (%Z)", self.connectTime),
             self.updays,
             self.uphours,
             self.upminutes,
@@ -95,7 +97,7 @@ class newBot():
         )
         return(self.uptime)
 
-    def send(self, message, parent=''):
+    def send(self, message, parent='', packet=False):
         """
         Sends the supplied message. The parent message can be specified.
 
@@ -103,22 +105,22 @@ class newBot():
         packet being replied to, and whether or not message is a complete packet.
 
         - message:  either a complete packet, or the `['data']['content']` field
-        of one. If the former - i.e. `type(message) == "<class 'dict'>"` - the
-        `message` variable will be sent unaltered. Otherwise, it will be sent as
-        the value of the 'content' field of a message with `type` 'send'.
+        of one. If the former, the packet argument must be set to true.
         - parent:   the id of the message being replied to. If not specified,
         karelia will send the message as a new parent i.e. bottom-level message.
+        - packet:   if set to `True`, the first argument will be treated as a
+        complete packet.
 
         `karelia.send('Top-level message')` will send that as a top-level message.
 
         `karelia.send('It's a reply!','02aa8y85m7hts')` will send that message as
         a reply to the message with id `02aa8y85m7hts`.
 
-        `karelia.send({'type': 'log', 'data': {'n':1000}})` will send a log
+        `karelia.send({'type': 'log', 'data': {'n':1000}}, True)` will send a log
         request for the thousand most recent messages posted to the room.
         """
         if not self.paused:
-            if type(message) == "<class 'dict'>" and len(message) > 0:
+            if packet == True and len(message) > 0:
                 self.conn.send(message)
             else:
                 self.conn.send(json.dumps({'type': 'send',
@@ -203,6 +205,7 @@ class newBot():
                                       packet['data']['id'])
                             return(sys.exit())
 
+                self.packet = packet
                 return(packet)
 
         except Exception as e:
@@ -213,7 +216,7 @@ class newBot():
         """Return the known-standard form of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
-    def log():
+    def log(self, e=False):
         """
         logs as much information as possible to an external file.
 
@@ -221,10 +224,13 @@ class newBot():
         processed at the time of the exception. It will then write out as much as
         it can about the exception to a logfile.
         """
-        logMessage = "{}: Exception on message:\n{}\n\nException was:\n{}".format(
-            time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
-            self.packet['data'],
-            traceback.format_exc())
-        with open("{} &{}.log".format(self.name[0], self.room), 'a') as f:
-            f.write(logMessage)
-        print(logMessage)
+        if e == False:
+            tbText = traceback.format_exc()
+            message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
+                "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
+        else:
+            message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
+                "%Y-%m-%d %H:%M:%S", time.gmtime()), e)
+        with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
+            f.write(message)
+        print(message)
