@@ -157,7 +157,7 @@ def parse(packet = False, name = False):
                 if packet['data']['content'] == '!help @{0}'.format(name):
                     for message in helpMessage:
                         sending = message.replace('**sender**','@{}'.format(
-                                packet['data']['sender']['name'].replace(' ',''))
+                                packet['data']['sender']['name'].replace(' ','')))
                         send(sending,packet['data']['id'])
                 if packet['data']['content'] == '!help' and not spoof:
                     send(shortHelp,packet['data']['id'])
