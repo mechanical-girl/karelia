@@ -137,7 +137,8 @@ this can be achieved by using the bot's `broadcast()` feature. It is up to
 the user to design the structure of data whick will be sent. However, the
 following template is provided:
 
-```broadcastMessage = {  'from': 'testing',
+```
+broadcastMessage = {  'from': 'testing',
                        'to': 'test;,
                        'type': 'notify',
                        'data': {   'from': 'senderName',
