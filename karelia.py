@@ -157,9 +157,10 @@ class newBot():
         values are available:
         
         | key           | default value             |
+        |---------------|---------------------------|
         | 'ping'        | 'Pong!'                   |
-        | 'shortHelp'   | <empty>                   |
-        | 'longHelp'    | <empty> (must be a list)  |
+        | 'shortHelp'   | (no response)             |
+        | 'longHelp'    | (no response)             |
         | 'pause'       | '/me has been paused'     |
         | 'unpause'     | '/me has been unpaused'   |
         | 'kill'        | '/me has been killed'     |
