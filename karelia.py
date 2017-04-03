@@ -36,15 +36,17 @@ class newBot():
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if type(name) == "<class 'list'>":
-            self.names = name
-        else:
-            self.names = [name]
+        if type(name) == "<class 'list'>": self.names = name
+        else: self.names = [name]
+        self.stockResponses = {'ping': 'Pong!',
+                      'shortHelp': '',
+                      'longHelp': [],
+                      'paused': '/me has been paused',
+                      'unpaused': '/me has been unpaused',
+                      'killed': '/me has been killed'}
         self.room = room
         self.paused = False
         self.lastMessage = ''
-        self.helpMessage = []
-        self.shortHelp = ''
         self.connectTime = time.gmtime()
         self.non_bmp_map = dict.fromkeys(
             range(0x10000, sys.maxunicode + 1), 0xfffd)
@@ -148,6 +150,19 @@ class newBot():
 
         For all commands with a name attached, it will reply if any of the names
         stored in self.names match.
+        
+        The responses to all botrulez-mandated commands (with the exception of
+        uptime, as The Powers That Be disapprove of dissident response formats
+        to it) can be altered with the bot.stockResponses dict. The following
+        values are available:
+        
+        | key           | default value             |
+        | 'ping'        | 'Pong!'                   |
+        | 'shortHelp'   | <empty>                   |
+        | 'longHelp'    | <empty> (must be a list)  |
+        | 'pause'       | '/me has been paused'     |
+        | 'unpause'     | '/me has been unpaused'   |
+        | 'kill'        | '/me has been killed'     |
 
         Regardless of actions taken, it will return the unaltered packet. If an
         error occurs, it will return an exception.
@@ -170,19 +185,19 @@ class newBot():
                 elif packet['type'] == "send-event":
 
                     if packet['data']['content'] == '!ping':
-                        self.send('Pong!', packet['data']['id'])
+                        self.send(self.stockResponses['ping'], packet['data']['id'])
                     elif packet['data']['content'] == '!help':
-                        self.send(self.shortHelp, packet['data']['id'])
+                        self.send(self.stockResponses['shortHelp'], packet['data']['id'])
                     elif packet['data']['content'] == "!antighost":
                         self.changeNick(self.names[0])
 
                     for name in self.names:
                         if packet['data']['content'] == '!ping @{0}'.format(name):
-                            self.send('Pong!', packet['data']['id'])
+                            self.send(self.stockResponses['ping'], packet['data']['id'])
                         if packet['data']['content'] == '!uptime @{0}'.format(name):
                             self.send(self.getUptime(), packet['data']['id'])
                         if packet['data']['content'] == '!pause @{0}'.format(name):
-                            self.send('/me has been paused',
+                            self.send(self.stockResponses['pause'],
                                       packet['data']['id'])
                             self.paused = True
                             self.log('{} PauseEvent from {}'.format(time.strftime(
@@ -193,15 +208,15 @@ class newBot():
                                 "%Y-%M-%D %H:%M:%S (%Z)", time.time()),
                                 packet['data']['sender']['name']))
                             self.paused = False
-                            self.send('/me has been unpaused',
+                            self.send(self.stockResponses['unpause'],
                                       packet['data']['id'])
                         if packet['data']['content'] == '!help @{0}'.format(name):
-                            for message in self.helpMessage:
+                            for message in self.stockResponses['longHelp']:
                                 sending = message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
                         if packet['data']['content'] == '!kill @{0}'.format(name):
-                            self.send("Bot killed; will now exit.",
+                            self.send(self.stockResponses['kill'],
                                       packet['data']['id'])
                             return(sys.exit())
 
