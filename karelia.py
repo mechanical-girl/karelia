@@ -268,13 +268,15 @@ class botCommand():
     the user to design the structure of data whick will be sent. However, the
     following template is provided:
 
-    ```broadcastMessage = {  'from': 'testing',
+    ```
+    broadcastMessage = {  'from': 'testing',
                            'to': 'test;,
                            'type': 'notify',
                            'data': {   'from': 'senderName',
                                        'message': 'message'
                                     }
-                            }```
+                            }
+    ```
 
     The user can then write code which only reads messages directed to the room
     to which it is connected, and can handle them accordingly, based on the
