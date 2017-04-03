@@ -86,6 +86,7 @@ to it) can be altered with the bot.stockResponses dict. The following
 values are available:
 
 | key           | default value             |
+|---------------|---------------------------|
 | 'ping'        | 'Pong!'                   |
 | 'shortHelp'   | <empty>                   |
 | 'longHelp'    | <empty>                   |
