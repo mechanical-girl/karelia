@@ -80,6 +80,19 @@ On receiving a packet, it will reply to pings (both global and specific),
 offer uptime, pause and unpause the bot, respond to help requests (again,
 both global and specific) and antighost commands, and kills the bot.
 
+The responses to all botrulez-mandated commands (with the exception of
+uptime, as The Powers That Be disapprove of dissident response formats
+to it) can be altered with the bot.stockResponses dict. The following
+values are available:
+
+| key           | default value             |
+| 'ping'        | 'Pong!'                   |
+| 'shortHelp'   | <empty>                   |
+| 'longHelp'    | <empty>                   |
+| 'pause'       | '/me has been paused'     |
+| 'unpause'     | '/me has been unpaused'   |
+| 'kill'        | '/me has been killed'     |
+
 For all commands with a name attached, it will reply if any of the names
 stored in self.names match.
 
