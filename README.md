@@ -143,7 +143,8 @@ following template is provided:
                        'data': {   'from': 'senderName',
                                    'message': 'message'
                                 }
-                        }```
+                        }
+```
 
 The user can then write code which only reads messages directed to the room
 to which it is connected, and can handle them accordingly, based on the
