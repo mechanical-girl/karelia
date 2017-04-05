@@ -7,6 +7,7 @@ platform at euphoria.io
 
 from websocket import create_connection
 import json, time, sys, os
+import traceback
 
 botName = ""
 startTime = time.time()
@@ -188,34 +189,20 @@ def spoof(packet, spoofBot):
         print("Spoofing error from karelia.py: " + str(e))
         return({"type": "error",'error':str(e)})
 
-def log(error = '', message = ''):
+def log(packet, e=False):
     """
     logs as much information as possible to an external file.
-
     log should be passed an exception object and if possible the message being
     processed at the time of the exception. It will then write out as much as
     it can about the exception to a logfile.
     """
-    try:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        exception = """Exception on message: {}
-{}: {}
-    {}
-{}
-}} at line {}
-
-""".format(message['data'], type(error), error, exc_type, exc_obj, fname,
-           exc_tb.tb_lineno)
-                                                  
-    except Exception as e:
-        print(e)
-        exception = """Intelligent logging failed, falling back.
-{}
-{}
-
-""".format(error, message)
-                                                  
-    with open("{} &{}.log".format(botName, room), 'a') as f:
-        f.write(exception)
-    print(exception)
+    if e == False:
+        tbText = traceback.format_exc()
+        message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.gmtime()), packet, tbText)
+    else:
+        message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.gmtime()), e)
+    with open("{}.log".format(botName), 'a') as f:
+        f.write(message)
+    print(message)
