@@ -99,7 +99,7 @@ class newBot():
         )
         return(self.uptime)
 
-    def send(self, message, parent='', packet=False):
+    def send(self, message, parent=''):
         """
         Sends the supplied message. The parent message can be specified.
 
@@ -110,21 +110,19 @@ class newBot():
         of one. If the former, the packet argument must be set to true.
         - parent:   the id of the message being replied to. If not specified,
         karelia will send the message as a new parent i.e. bottom-level message.
-        - packet:   if set to `True`, the first argument will be treated as a
-        complete packet.
 
         `karelia.send('Top-level message')` will send that as a top-level message.
 
         `karelia.send('It's a reply!','02aa8y85m7hts')` will send that message as
         a reply to the message with id `02aa8y85m7hts`.
 
-        `karelia.send({'type': 'log', 'data': {'n':1000}}, True)` will send a log
+        `karelia.send({'type': 'log', 'data': {'n':1000}})` will send a log
         request for the thousand most recent messages posted to the room.
         """
         if not self.paused:
-            if packet == True and len(message) > 0:
-                self.conn.send(message)
-            else:
+            if type(message) is dict:
+                self.conn.send(json.dumps(message))
+            elif len(message) > 0:
                 self.conn.send(json.dumps({'type': 'send',
                                            'data': {'content': message,
                                                     'parent': parent}}))
@@ -212,7 +210,10 @@ class newBot():
                             self.send(self.stockResponses['unpause'],
                                       packet['data']['id'])
                         if packet['data']['content'] == '!help @{0}'.format(name):
+                            if type(self.stockResponses['longHelp']) != "<class 'list'>":
+                                self.stockResponses['longHelp'] = [self.stockResponses['longHelp']]
                             for message in self.stockResponses['longHelp']:
+                                
                                 sending = message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
@@ -240,13 +241,13 @@ class newBot():
         processed at the time of the exception. It will then write out as much as
         it can about the exception to a logfile.
         """
-        if e == False:
-            tbText = traceback.format_exc()
-            message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
-        else:
+        #if e == False:
+        tbText = traceback.format_exc()
+        message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
+        """else:
             message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime()), e)
+                "%Y-%m-%d %H:%M:%S", time.gmtime()), e)"""
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
             f.write(message)
         print(message)
