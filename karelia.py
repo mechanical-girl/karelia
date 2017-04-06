@@ -189,7 +189,7 @@ def spoof(packet, spoofBot):
         print("Spoofing error from karelia.py: " + str(e))
         return({"type": "error",'error':str(e)})
 
-def log(packet, e=False):
+def log(packet, e = False):
     """
     logs as much information as possible to an external file.
     log should be passed an exception object and if possible the message being
@@ -201,8 +201,7 @@ def log(packet, e=False):
         message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
             "%Y-%m-%d %H:%M:%S", time.gmtime()), packet, tbText)
     else:
-        message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
-            "%Y-%m-%d %H:%M:%S", time.gmtime()), e)
+        message = "{}\n{}: {}\n{}\n\n".format("-" * 20, time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.gmtime()), packet, e)
     with open("{}.log".format(botName), 'a') as f:
         f.write(message)
-    print(message)
