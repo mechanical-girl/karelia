@@ -220,7 +220,8 @@ class newBot():
                         if packet['data']['content'] == '!kill @{0}'.format(name):
                             self.send(self.stockResponses['kill'],
                                       packet['data']['id'])
-                            return(sys.exit())
+                            self.disconnect()
+                            return('Killed')
 
                 self.packet = packet
                 return(packet)
@@ -233,7 +234,7 @@ class newBot():
         """Return the known-standard form of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
-    def log(self, e=False):
+    def log(self, message, **kwargs):
         """
         logs as much information as possible to an external file.
 
@@ -241,16 +242,17 @@ class newBot():
         processed at the time of the exception. It will then write out as much as
         it can about the exception to a logfile.
         """
-        #if e == False:
-        tbText = traceback.format_exc()
-        message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
-            "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
-        """else:
+        e = None
+        if 'e' in kwargs: e = kwargs['e']
+        if e == None:
+            tbText = traceback.format_exc()
+            message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
+                "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
+        else:
             message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime()), e)"""
+                "%Y-%m-%d %H:%M:%S", time.gmtime()), message)
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
             f.write(message)
-        print(message)
 
 class botCommand():
     """
