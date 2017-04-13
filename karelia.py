@@ -164,11 +164,7 @@ class newBot():
         Regardless of actions taken, it will return the unaltered packet. If an
         error occurs, it will return an exception.
 
-        The long help response supports inserting the sender's name. This should
-        be done with a formatting string, like so:
-        `longHelp = 'Thanks for asking, {senderName}! This bot...`
-
-        Note: as of 2017-03-16 if killed, it will return sthe string 'Killed'.
+        Note: as of 2017-03-16 if killed, it will return sys.exit().
         """
 
         try:
@@ -195,10 +191,8 @@ class newBot():
                     for name in self.names:
                         if packet['data']['content'] == '!ping @{0}'.format(name):
                             self.send(self.stockResponses['ping'], packet['data']['id'])
-                            
                         if packet['data']['content'] == '!uptime @{0}'.format(name):
                             self.send(self.getUptime(), packet['data']['id'])
-                            
                         if packet['data']['content'] == '!pause @{0}'.format(name):
                             self.send(self.stockResponses['pause'],
                                       packet['data']['id'])
@@ -206,7 +200,6 @@ class newBot():
                             self.log('{} PauseEvent from {}'.format(time.strftime(
                                 "%a, %d %b %Y %H:%M:%S (%Z)", time.time()),
                                 packet['data']['sender']['name']))
-                            
                         if packet['data']['content'] == '!unpause @{0}'.format(name):
                             self.log('{} UnpauseEvent from {}'.format(time.strftime(
                                 "%Y-%M-%D %H:%M:%S (%Z)", time.time()),
@@ -214,16 +207,14 @@ class newBot():
                             self.paused = False
                             self.send(self.stockResponses['unpause'],
                                       packet['data']['id'])
-                            
                         if packet['data']['content'] == '!help @{0}'.format(name):
                             if type(self.stockResponses['longHelp']) != "<class 'list'>":
                                 self.stockResponses['longHelp'] = [self.stockResponses['longHelp']]
-                                
                             for message in self.stockResponses['longHelp']:
-                                    data = {'senderName': packet['data']['sender']['name']}
-                                    sending = message.format(**data))
-                                self.send(sending, packet['data']['id'])
                                 
+                                sending = message.format(self.normaliseNick(
+                                    packet['data']['sender']['name']))
+                                self.send(sending, packet['data']['id'])
                         if packet['data']['content'] == '!kill @{0}'.format(name):
                             self.send(self.stockResponses['kill'],
                                       packet['data']['id'])
@@ -241,7 +232,7 @@ class newBot():
         """Return the known-standard form of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
-    def log(self, message, **kwargs):
+    def log(self, **kwargs):
         """
         logs as much information as possible to an external file.
 
@@ -249,15 +240,18 @@ class newBot():
         processed at the time of the exception. It will then write out as much as
         it can about the exception to a logfile.
         """
-        e = None
-        if 'e' in kwargs: e = kwargs['e']
-        if e == None:
+        message = None
+        if 'message' in kwargs: message = kwargs['message']
+        currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        delimit = "-" * 20
+        if message == None:
             tbText = traceback.format_exc()
-            message = "{}\n{} - Exception on message: {}:\n{} \n\n".format("-" * 20, time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime()), self.packet['data'], tbText)
+            logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
+                                                        "Exception on message",
+                                                        self.packet['data'],
+                                                        tbText)
         else:
-            message = "{}\n{}: {}\n\n".format("-" * 20, time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime()), message)
+            logText = "{}\n{}: {}\n\n".format(delimit, currTime, message)
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
-            f.write(message)
+            f.write(logText)
 
