@@ -23,8 +23,8 @@ the Heim servers at euphoria.io.
 To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
 which will return a bot object.
 
-### \_\_init\_\_
-`\_\_init\_\_(self, name, room)`: 
+### __init__
+`__init__(self, name, room)`: 
 Inits the bot object
 
 ### connect
