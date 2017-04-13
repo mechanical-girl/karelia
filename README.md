@@ -114,38 +114,3 @@ log should be passed an exception object and if possible the message being
 processed at the time of the exception. It will then write out as much as
 it can about the exception to a logfile.
 
-botCommand
-------
-
-The botCommand object takes a list of rooms and a list (or a list of lists)
-and creates a bot for each room, then returns itself. The list of bots can
-be accessed at botCommand.bots.
-
-If the names parameter is a list, then each bot will be passed that list as
-the names it should respond to. If it is a list of lists, then the bot
-connecting to `rooms[0]` will receive `names[0]`, the bot connecting to
-`rooms[1]` will receive `names[1]` and so on.
-
-The botCommand object can be used for interbot communication. For instance,
-if a bot is in several rooms, and is required to communicate between them,
-this can be achieved by using the bot's `broadcast()` feature. It is up to
-the user to design the structure of data whick will be sent. However, the
-following template is provided:
-
-```
-broadcastMessage = {  'from': 'testing',
-                       'to': 'test;,
-                       'type': 'notify',
-                       'data': {   'from': 'senderName',
-                                   'message': 'message'
-                                }
-                        }
-```
-
-The user can then write code which only reads messages directed to the room
-to which it is connected, and can handle them accordingly, based on the
-`type` and `data` fields.
-
-A botCommander (the name for a single botCommand object) can also send a
-signal to bots using the `broadcast()` function.
-
