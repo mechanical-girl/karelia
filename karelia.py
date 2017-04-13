@@ -161,7 +161,11 @@ class newBot():
         Regardless of actions taken, it will return the unaltered packet. If an
         error occurs, it will return an exception.
 
-        Note: as of 2017-03-16 if killed, it will return sys.exit().
+        The long help response supports inserting the sender's name. This should
+        be done with a formatting string, like so:
+        `longHelp = 'Thanks for asking, {senderName}! This bot...`
+
+        Note: as of 2017-03-16 if killed, it will return sthe string 'Killed'.
         """
 
         try:
@@ -188,8 +192,10 @@ class newBot():
                     for name in self.names:
                         if packet['data']['content'] == '!ping @{0}'.format(name):
                             self.send(self.stockResponses['ping'], packet['data']['id'])
+                            
                         if packet['data']['content'] == '!uptime @{0}'.format(name):
                             self.send(self.getUptime(), packet['data']['id'])
+                            
                         if packet['data']['content'] == '!pause @{0}'.format(name):
                             self.send(self.stockResponses['pause'],
                                       packet['data']['id'])
@@ -197,6 +203,7 @@ class newBot():
                             self.log('{} PauseEvent from {}'.format(time.strftime(
                                 "%a, %d %b %Y %H:%M:%S (%Z)", time.time()),
                                 packet['data']['sender']['name']))
+                            
                         if packet['data']['content'] == '!unpause @{0}'.format(name):
                             self.log('{} UnpauseEvent from {}'.format(time.strftime(
                                 "%Y-%M-%D %H:%M:%S (%Z)", time.time()),
@@ -204,14 +211,16 @@ class newBot():
                             self.paused = False
                             self.send(self.stockResponses['unpause'],
                                       packet['data']['id'])
+                            
                         if packet['data']['content'] == '!help @{0}'.format(name):
                             if type(self.stockResponses['longHelp']) != "<class 'list'>":
                                 self.stockResponses['longHelp'] = [self.stockResponses['longHelp']]
-                            for message in self.stockResponses['longHelp']:
                                 
-                                sending = message.format(self.normaliseNick(
-                                    packet['data']['sender']['name']))
+                            for message in self.stockResponses['longHelp']:
+                                    data = {'senderName': packet['data']['sender']['name']}
+                                    sending = message.format(**data))
                                 self.send(sending, packet['data']['id'])
+                                
                         if packet['data']['content'] == '!kill @{0}'.format(name):
                             self.send(self.stockResponses['kill'],
                                       packet['data']['id'])

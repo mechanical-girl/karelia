@@ -103,7 +103,11 @@ values are available:
 Regardless of actions taken, it will return the unaltered packet. If an
 error occurs, it will return an exception.
 
-Note: as of 2017-03-16 if killed, it will return sys.exit().
+The long help response supports inserting the sender's name. This should
+be done with a formatting string, like so:
+`longHelp = 'Thanks for asking, {senderName}! This bot...`
+
+Note: as of 2017-03-16 if killed, it will return sthe string 'Killed'.
 
 ### normaliseNick
 `normaliseNick(self, nick)`: 
