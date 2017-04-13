@@ -41,7 +41,13 @@ changeNick sends the `nick` command to Heim servers.
 If a nick is passed in as an argument, it will change to that and change
 the `botName` variable to the value passed as an argument (for resilience
 against `!antighost`, amongst other reasons). If no nick is specified, it
+<<<<<<< HEAD
 will assume that the `botName` variable is the desired nick.
+=======
+=======
+will assume that the string at `name[0]` variable is the desired nick.
+>>>>>>> 92f0d2a57b552050d19660ba86316bd1a71fe6f9
+
 
 ### getUptime
 `getUptime(self)`: 
@@ -55,36 +61,12 @@ Arguments are: the message to be sent, the id of the parent message, the
 packet being replied to, and whether or not message is a complete packet.
 
 - message:  either a complete packet, or the `['data']['content']` field
+<<<<<<< HEAD
 of one. If the former, the packet argument must be set to true.
 - parent:   the id of the message being replied to. If not specified,
 karelia will send the message as a new parent i.e. bottom-level message.
-
-`karelia.send('Top-level message')` will send that as a top-level message.
-
-`karelia.send('It's a reply!','02aa8y85m7hts')` will send that message as
-a reply to the message with id `02aa8y85m7hts`.
-
-`karelia.send({'type': 'log', 'data': {'n':1000}})` will send a log
-request for the thousand most recent messages posted to the room.
-
-### disconnect
-`disconnect(self)`: 
-Attempts to close the connection at self.conn.
-
-### parse
-`parse(self)`: 
-parse() handles the commands specified in the Botrulez
-(github.com/jedevc/botrulez) and those required to stay alive.
-
-parse() is a blocking function - that is, it will always wait until it
-receives a packet from heim before returning.
-
-On receiving a packet, it will reply to pings (both global and specific),
-offer uptime, pause and unpause the bot, respond to help requests (again,
-both global and specific) and antighost commands, and kills the bot.
-
-For all commands with a name attached, it will reply if any of the names
-stored in self.names match.
+=======
+>>>>>>> 92f0d2a57b552050d19660ba86316bd1a71fe6f9
 
 The responses to all botrulez-mandated commands (with the exception of
 uptime, as The Powers That Be disapprove of dissident response formats
@@ -115,6 +97,76 @@ logs as much information as possible to an external file.
 
 log should be passed an exception object and if possible the message being
 processed at the time of the exception. It will then write out as much as
+it can about the exception to a logfile.
+
+botCommand
+------
+
+<<<<<<< HEAD
+The responses to all botrulez-mandated commands (with the exception of
+uptime, as The Powers That Be disapprove of dissident response formats
+to it) can be altered with the bot.stockResponses dict. The following
+values are available:
+
+| key           | default value             |
+|---------------|---------------------------|
+| 'ping'        | 'Pong!'                   |
+| 'shortHelp'   | (no response)             |
+| 'longHelp'    | (no response)             |
+| 'pause'       | '/me has been paused'     |
+| 'unpause'     | '/me has been unpaused'   |
+| 'kill'        | '/me has been killed'     |
+
+=======
+The botCommand object takes a list of rooms and a list (or a list of lists)
+and creates a bot for each room, then returns itself. The list of bots can
+be accessed at botCommand.bots.
+
+If the names parameter is a list, then each bot will be passed that list as
+the names it should respond to. If it is a list of lists, then the bot
+connecting to `rooms[0]` will receive `names[0]`, the bot connecting to
+`rooms[1]` will receive `names[1]` and so on.
+
+The botCommand object can be used for interbot communication. For instance,
+if a bot is in several rooms, and is required to communicate between them,
+this can be achieved by using the bot's `broadcast()` feature. It is up to
+the user to design the structure of data whick will be sent. However, the
+following template is provided:
+
+```
+broadcastMessage = {  'from': 'testing',
+                       'to': 'test;,
+                       'type': 'notify',
+                       'data': {   'from': 'senderName',
+                                   'message': 'message'
+                                }
+                        }
+```
+
+The user can then write code which only reads messages directed to the room
+to which it is connected, and can handle them accordingly, based on the
+`type` and `data` fields.
+
+A botCommander (the name for a single botCommand object) can also send a
+signal to bots using the `broadcast()` function.
+=======
+>>>>>>> 92f0d2a57b552050d19660ba86316bd1a71fe6f9
+Regardless of actions taken, it will return the unaltered packet. If an
+error occurs, it will return an exception.
+
+Note: as of 2017-03-16 if killed, it will return sys.exit().
+
+### normaliseNick
+`normaliseNick(self, nick)`: 
+Return the known-standard form of the supplied nick.
+
+### log
+`log(self, message, **kwargs)`: 
+logs as much information as possible to an external file.
+
+log should be passed an exception object and if possible the message being
+processed at the time of the exception. It will then write out as much as
+<<<<<<< HEAD
 it can about the exception to a logfile.
 
 botCommand
@@ -152,3 +204,6 @@ to which it is connected, and can handle them accordingly, based on the
 A botCommander (the name for a single botCommand object) can also send a
 signal to bots using the `broadcast()` function.
 
+=======
+it can about the exception to a logfile.
+>>>>>>> 92f0d2a57b552050d19660ba86316bd1a71fe6f9

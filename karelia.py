@@ -29,9 +29,6 @@ class newBot():
 
     To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
     which will return a bot object.
-
-    A bot object has the following functions:
-    - `connect` connects to the room specified on creation
     """
 
     def __init__(self, name, room):
