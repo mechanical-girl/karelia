@@ -48,7 +48,7 @@ will assume that the `botName` variable is the desired nick.
 Called by the `!uptime` command. Returns time since connect as string.
 
 ### send
-`send(self, message, parent='', packet=False)`: 
+`send(self, message, parent='')`: 
 Sends the supplied message. The parent message can be specified.
 
 Arguments are: the message to be sent, the id of the parent message, the
@@ -58,15 +58,13 @@ packet being replied to, and whether or not message is a complete packet.
 of one. If the former, the packet argument must be set to true.
 - parent:   the id of the message being replied to. If not specified,
 karelia will send the message as a new parent i.e. bottom-level message.
-- packet:   if set to `True`, the first argument will be treated as a
-complete packet.
 
 `karelia.send('Top-level message')` will send that as a top-level message.
 
 `karelia.send('It's a reply!','02aa8y85m7hts')` will send that message as
 a reply to the message with id `02aa8y85m7hts`.
 
-`karelia.send({'type': 'log', 'data': {'n':1000}}, True)` will send a log
+`karelia.send({'type': 'log', 'data': {'n':1000}})` will send a log
 request for the thousand most recent messages posted to the room.
 
 ### disconnect
@@ -112,7 +110,7 @@ Note: as of 2017-03-16 if killed, it will return sys.exit().
 Return the known-standard form of the supplied nick.
 
 ### log
-`log(self, e=False)`: 
+`log(self, message, **kwargs)`: 
 logs as much information as possible to an external file.
 
 log should be passed an exception object and if possible the message being
