@@ -2,22 +2,17 @@
 
 """
 Karelia is a library of functions for connecting a bot to the Heim chat
-platform at euphoria.io
+platform at euphoria.io                                              
 """
 
 from websocket import create_connection
+import json, time, sys, os
 import traceback
-import json
-import time
-import sys
-import os
-import re
 
 
 class KareliaException(Exception):
     """Generic exception"""
     pass
-
 
 class newBot():
     """newBot represents a single bot for euphoria.io
