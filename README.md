@@ -23,11 +23,8 @@ the Heim servers at euphoria.io.
 To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
 which will return a bot object.
 
-A bot object has the following functions:
-- `connect` connects to the room specified on creation
-
-### __init__
-`__init__(self, name, room)`: 
+### \_\_init\_\_
+`\_\_init\_\_(self, name, room)`: 
 Inits the bot object
 
 ### connect
@@ -103,20 +100,17 @@ values are available:
 Regardless of actions taken, it will return the unaltered packet. If an
 error occurs, it will return an exception.
 
-The long help response supports inserting the sender's name. This should
-be done with a formatting string, like so:
-`longHelp = 'Thanks for asking, {senderName}! This bot...`
-
-Note: as of 2017-03-16 if killed, it will return sthe string 'Killed'.
+Note: as of 2017-03-16 if killed, it will return sys.exit().
 
 ### normaliseNick
 `normaliseNick(self, nick)`: 
 Return the known-standard form of the supplied nick.
 
 ### log
-`log(self, message, **kwargs)`: 
+`log(self, **kwargs)`: 
 logs as much information as possible to an external file.
 
 log should be passed an exception object and if possible the message being
 processed at the time of the exception. It will then write out as much as
 it can about the exception to a logfile.
+
