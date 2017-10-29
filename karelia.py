@@ -33,14 +33,16 @@ class newBot():
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if type(name) == "<class 'list'>": self.names = name
-        else: self.names = [name]
+        if type(name) == "<class 'list'>":
+            self.names = name
+        else:
+            self.names = [name]
         self.stockResponses = {'ping': 'Pong!',
-                      'shortHelp': '',
-                      'longHelp': [],
-                      'paused': '/me has been paused',
-                      'unpaused': '/me has been unpaused',
-                      'killed': '/me has been killed'}
+                               'shortHelp': '',
+                               'longHelp': [],
+                               'paused': '/me has been paused',
+                               'unpaused': '/me has been unpaused',
+                               'killed': '/me has been killed'}
         self.room = room
         self.paused = False
         self.lastMessage = ''
@@ -55,6 +57,8 @@ class newBot():
         if not stealth:
             self.changeNick()
         self.stealth = stealth
+        self.parse()
+        self.parse()
 
     def changeNick(self, nick=''):
         """
@@ -146,12 +150,12 @@ class newBot():
 
         For all commands with a name attached, it will reply if any of the names
         stored in self.names match.
-        
+
         The responses to all botrulez-mandated commands (with the exception of
         uptime, as The Powers That Be disapprove of dissident response formats
         to it) can be altered with the bot.stockResponses dict. The following
         values are available:
-        
+
         | key           | default value             |
         |---------------|---------------------------|
         | 'ping'        | 'Pong!'                   |
@@ -182,15 +186,18 @@ class newBot():
                 elif packet['type'] == "send-event":
 
                     if packet['data']['content'] == '!ping':
-                        self.send(self.stockResponses['ping'], packet['data']['id'])
+                        self.send(
+                            self.stockResponses['ping'], packet['data']['id'])
                     elif packet['data']['content'] == '!help':
-                        self.send(self.stockResponses['shortHelp'], packet['data']['id'])
+                        self.send(
+                            self.stockResponses['shortHelp'], packet['data']['id'])
                     elif packet['data']['content'] == "!antighost" and not self.stealth:
                         self.changeNick(self.names[0])
 
-                    for name in self.names:
+                    for name in [name.replace(' ', '') for name in self.names]:
                         if packet['data']['content'] == '!ping @{0}'.format(name):
-                            self.send(self.stockResponses['ping'], packet['data']['id'])
+                            self.send(
+                                self.stockResponses['ping'], packet['data']['id'])
                         if packet['data']['content'] == '!uptime @{0}'.format(name):
                             self.send(self.getUptime(), packet['data']['id'])
                         if packet['data']['content'] == '!pause @{0}'.format(name):
@@ -209,9 +216,10 @@ class newBot():
                                       packet['data']['id'])
                         if packet['data']['content'] == '!help @{0}'.format(name):
                             if type(self.stockResponses['longHelp']) != "<class 'list'>":
-                                self.stockResponses['longHelp'] = [self.stockResponses['longHelp']]
+                                self.stockResponses['longHelp'] = [
+                                    self.stockResponses['longHelp']]
                             for message in self.stockResponses['longHelp']:
-                                
+
                                 sending = message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
@@ -241,7 +249,8 @@ class newBot():
         it can about the exception to a logfile.
         """
         message = None
-        if 'message' in kwargs: message = kwargs['message']
+        if 'message' in kwargs:
+            message = kwargs['message']
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
         if message == None:
@@ -254,4 +263,3 @@ class newBot():
             logText = "{}\n{}: {}\n\n".format(delimit, currTime, message)
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
             f.write(logText)
-
