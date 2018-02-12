@@ -71,6 +71,8 @@ class newBot():
         """
         if nick == '':
             nick = self.names[0]
+        else:
+            self.names[0] = nick
         self.conn.send(json.dumps(
             {"type": "nick", "data": {"name": nick}}))
 
@@ -161,9 +163,9 @@ class newBot():
         | 'ping'        | 'Pong!'                   |
         | 'shortHelp'   | (no response)             |
         | 'longHelp'    | (no response)             |
-        | 'pause'       | '/me has been paused'     |
-        | 'unpause'     | '/me has been unpaused'   |
-        | 'kill'        | '/me has been killed'     |
+        | 'paused'       | '/me has been paused'     |
+        | 'unpaused'     | '/me has been unpaused'   |
+        | 'killed'        | '/me has been killed'     |
 
         Regardless of actions taken, it will return the unaltered packet. If an
         error occurs, it will return an exception.
@@ -177,44 +179,44 @@ class newBot():
             if self.lastMessage != incoming:
                 packet = json.loads(incoming)
                 self.packet = packet
-
                 if packet["type"] == "ping-event":
                     self.conn.send(json.dumps({'type': 'ping-reply',
                                                'data': {
                                                    'time': packet['data']['time']}}))
 
-                elif packet['type'] == "send-event":
+                elif packet['type'] == "send-event" and packet['data']['content'][0] == '!':
 
                     if packet['data']['content'] == '!ping':
-                        self.send(
-                            self.stockResponses['ping'], packet['data']['id'])
+                        self.send(self.stockResponses['ping'], packet['data']['id'])
                     elif packet['data']['content'] == '!help':
-                        self.send(
-                            self.stockResponses['shortHelp'], packet['data']['id'])
+                        self.send(self.stockResponses['shortHelp'], packet['data']['id'])
                     elif packet['data']['content'] == "!antighost" and not self.stealth:
                         self.changeNick(self.names[0])
 
-                    for name in [name.replace(' ', '') for name in self.names]:
-                        if packet['data']['content'] == '!ping @{0}'.format(name):
-                            self.send(
-                                self.stockResponses['ping'], packet['data']['id'])
-                        if packet['data']['content'] == '!uptime @{0}'.format(name):
+                    command = packet['data']['content'].split()[0]
+                    try:
+                        commandName = self.normaliseNick(packet['data']['content'].split()[1][1:])
+                    except IndexError:
+                        commandName = ''
+                    if commandName in [self.normaliseNick(name) for name in self.names]:
+                        if command == '!ping':
+                            self.send(self.stockResponses['ping'], packet['data']['id'])
+                        if command == '!uptime':
                             self.send(self.getUptime(), packet['data']['id'])
-                        if packet['data']['content'] == '!pause @{0}'.format(name):
-                            self.send(self.stockResponses['pause'],
-                                      packet['data']['id'])
+                        if command == '!pause':
+                            self.send(self.stockResponses['paused'], packet['data']['id'])
                             self.paused = True
                             self.log('{} PauseEvent from {}'.format(time.strftime(
                                 "%a, %d %b %Y %H:%M:%S (%Z)", time.time()),
                                 packet['data']['sender']['name']))
-                        if packet['data']['content'] == '!unpause @{0}'.format(name):
+                        if command == '!unpause':
                             self.log('{} UnpauseEvent from {}'.format(time.strftime(
                                 "%Y-%M-%D %H:%M:%S (%Z)", time.time()),
                                 packet['data']['sender']['name']))
                             self.paused = False
-                            self.send(self.stockResponses['unpause'],
+                            self.send(self.stockResponses['unpaused'],
                                       packet['data']['id'])
-                        if packet['data']['content'] == '!help @{0}'.format(name):
+                        if command == '!help':
                             if type(self.stockResponses['longHelp']) != "<class 'list'>":
                                 self.stockResponses['longHelp'] = [
                                     self.stockResponses['longHelp']]
@@ -223,8 +225,8 @@ class newBot():
                                 sending = message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
-                        if packet['data']['content'] == '!kill @{0}'.format(name):
-                            self.send(self.stockResponses['kill'],
+                        if command == '!kill':
+                            self.send(self.stockResponses['killed'],
                                       packet['data']['id'])
                             self.disconnect()
                             return('Killed')
