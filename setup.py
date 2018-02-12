@@ -6,4 +6,7 @@ setup(  name='Karelia',
         author='Pouncy Silverkitten',
         author_email='pouncy.sk@gmail.com',
         url='https://github.com/pouncysilverkitten/karelia',
+        install_requires=[
+            'websocket-client',
+        ],
         py_modules=['karelia'],)
