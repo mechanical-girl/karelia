@@ -27,8 +27,11 @@ class newBot():
     capable of maintaining and utilising a two-way connection between itself and
     the Heim servers at euphoria.io.
 
-    To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
+    To create a bot which only responds to a single nick, call `karelia.newBot(nick, room)`
     which will return a bot object.
+    Alternatively, to have a bot respond to multiple names, call
+    `karelia.newBot([list, of, nicks], room)` which will present as
+    the first nick in the list, but respond to stock commands send to all nicks.
     """
 
     def __init__(self, name, room):
@@ -73,8 +76,7 @@ class newBot():
             nick = self.names[0]
         else:
             self.names[0] = nick
-        self.conn.send(json.dumps(
-            {"type": "nick", "data": {"name": nick}}))
+        self.send({"type": "nick", "data": {"name": nick}})
 
     def getUptime(self):
         """Called by the `!uptime` command. Returns time since connect as string."""
@@ -111,7 +113,7 @@ class newBot():
         packet being replied to, and whether or not message is a complete packet.
 
         - message:  either a complete packet, or the `['data']['content']` field
-        of one. If the former, the packet argument must be set to true.
+        of one.
         - parent:   the id of the message being replied to. If not specified,
         karelia will send the message as a new parent i.e. bottom-level message.
 
@@ -163,14 +165,15 @@ class newBot():
         | 'ping'        | 'Pong!'                   |
         | 'shortHelp'   | (no response)             |
         | 'longHelp'    | (no response)             |
-        | 'paused'       | '/me has been paused'     |
-        | 'unpaused'     | '/me has been unpaused'   |
-        | 'killed'        | '/me has been killed'     |
+        | 'paused'      | '/me has been paused'     |
+        | 'unpaused'    | '/me has been unpaused'   |
+        | 'killed'      | '/me has been killed'     |
 
         Regardless of actions taken, it will return the unaltered packet. If an
         error occurs, it will return an exception.
 
-        Note: as of 2017-03-16 if killed, it will return sys.exit().
+        Note: as of 2017-03-16 if killed, it will disconnect automatically
+        and return the string 'Killed'.
         """
 
         try:
@@ -239,16 +242,12 @@ class newBot():
                 {'message': 'There was an error parsing the message', 'error': e})
 
     def normaliseNick(self, nick):
-        """Return the known-standard form of the supplied nick."""
+        """Return the known-standard form i(i.e., lowercase with no whitespace) of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
     def log(self, **kwargs):
         """
         logs as much information as possible to an external file.
-
-        log should be passed an exception object and if possible the message being
-        processed at the time of the exception. It will then write out as much as
-        it can about the exception to a logfile.
         """
         message = None
         if 'message' in kwargs:

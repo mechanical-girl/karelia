@@ -20,8 +20,11 @@ a bot object is a collection of functions which, when used correctly, are
 capable of maintaining and utilising a two-way connection between itself and
 the Heim servers at euphoria.io.
 
-To create a bot, call `karelia.newBot(['list', 'of', 'nicks'], ['rooms'])`
+To create a bot which only responds to a single nick, call `karelia.newBot(nick, room)`
 which will return a bot object.
+Alternatively, to have a bot respond to multiple names, call
+`karelia.newBot([list, of, nicks], room)` which will present as
+the first nick in the list, but respond to stock commands send to all nicks.
 
 ### \_\_init\_\_
 `__init__(self, name, room)`: 
@@ -52,7 +55,7 @@ Arguments are: the message to be sent, the id of the parent message, the
 packet being replied to, and whether or not message is a complete packet.
 
 - message:  either a complete packet, or the `['data']['content']` field
-of one. If the former, the packet argument must be set to true.
+of one.
 - parent:   the id of the message being replied to. If not specified,
 karelia will send the message as a new parent i.e. bottom-level message.
 
@@ -93,24 +96,21 @@ values are available:
 | 'ping'        | 'Pong!'                   |
 | 'shortHelp'   | (no response)             |
 | 'longHelp'    | (no response)             |
-| 'pause'       | '/me has been paused'     |
-| 'unpause'     | '/me has been unpaused'   |
-| 'kill'        | '/me has been killed'     |
+| 'paused'      | '/me has been paused'     |
+| 'unpaused'    | '/me has been unpaused'   |
+| 'killed'      | '/me has been killed'     |
 
 Regardless of actions taken, it will return the unaltered packet. If an
 error occurs, it will return an exception.
 
-Note: as of 2017-03-16 if killed, it will return sys.exit().
+Note: as of 2017-03-16 if killed, it will disconnect automatically
+and return the string 'Killed'.
 
 ### normaliseNick
 `normaliseNick(self, nick)`: 
-Return the known-standard form of the supplied nick.
+Return the known-standard form i(i.e., lowercase with no whitespace) of the supplied nick.
 
 ### log
 `log(self, **kwargs)`: 
 logs as much information as possible to an external file.
-
-log should be passed an exception object and if possible the message being
-processed at the time of the exception. It will then write out as much as
-it can about the exception to a logfile.
 
