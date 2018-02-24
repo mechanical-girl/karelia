@@ -95,7 +95,7 @@ class newBot():
             self.upticks -= 60
 
         self.uptime = "/me has been up since {} UTC ({} days, {} hours, {} minutes)".format(
-            time.strftime("%a, %d %b %Y %H:%M:%S (%Z)", self.connectTime),
+            time.strftime("%a, %d %b %Y %H:%M:%S", self.connectTime),
             self.updays,
             self.uphours,
             self.upminutes,
