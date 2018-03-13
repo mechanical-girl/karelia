@@ -138,7 +138,7 @@ class newBot():
         try:
             self.conn.close()
         except Exception as e:
-            self.log(e)
+            self.log()
 
     def parse(self):
         """
