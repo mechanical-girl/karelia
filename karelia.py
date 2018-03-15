@@ -6,13 +6,13 @@ platform at euphoria.io
 """
 
 from websocket import create_connection
+import websocket
 import traceback
 import json
 import time
 import sys
 import os
 import re
-
 
 class KareliaException(Exception):
     """Generic exception"""
@@ -50,6 +50,7 @@ class newBot():
         self.paused = False
         self.lastMessage = ''
         self.connectTime = time.gmtime()
+        websocket.enableTrace(False)
         self.non_bmp_map = dict.fromkeys(
             range(0x10000, sys.maxunicode + 1), 0xfffd)
 
@@ -254,6 +255,8 @@ class newBot():
             message = kwargs['message']
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
+        if not self.packet:
+            self.packet = {"data": "No message"}
         if message == None:
             tbText = traceback.format_exc()
             logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
