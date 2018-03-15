@@ -255,7 +255,7 @@ class newBot():
             message = kwargs['message']
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
-        if not hasattr(self, packet):
+        if not hasattr(self, 'packet'):
             self.packet = {"data": "No message"}
         if message == None:
             tbText = traceback.format_exc()
