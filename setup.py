@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(  name='Karelia',
-        version='1.1',
+        version='1.2',
         description='Python library for euphoria.io',
         author='Pouncy Silverkitten',
         author_email='pouncy.sk@gmail.com',
