@@ -257,13 +257,12 @@ class newBot():
         delimit = "-" * 20
         if not hasattr(self, 'packet'):
             self.packet = {"data": "No message"}
-        if message == None:
-            tbText = traceback.format_exc()
-            logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
-                                                        "Exception on message",
-                                                        self.packet['data'],
-                                                        tbText)
-        else:
-            logText = "{}\n{}: {}\n\n".format(delimit, currTime, message)
+        
+        tbText = traceback.format_exc()
+        logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
+                                                    "Exception on message",
+                                                    self.packet['data'],
+                                                    tbText)
+
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
             f.write(logText)
