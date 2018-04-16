@@ -276,12 +276,12 @@ class newBot:
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
         if not hasattr(self, 'packet'):
-            self.packet = {"data": "No message"}
+            self.packet = {}
         
         tbText = traceback.format_exc()
         logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
                                                     "Exception on message",
-                                                    self.packet['data'],
+                                                    self.packet,
                                                     tbText)
 
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
