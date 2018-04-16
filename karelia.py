@@ -18,8 +18,28 @@ class KareliaException(Exception):
     """Generic exception"""
     pass
 
+class Sender:
+    def __init__(self, name, sid, serv_id, serv_era, sess_id):
+        self.name = name
+        self.id = sid
+        self.server_id = serv_id
+        self.server_era = serv_era
+        self.session_id = sess_id
 
-class newBot():
+class DataStruct:
+    def __init__(self, mid, time, content, sid, name, serv_id, serv_era, sess_id):
+        self.id = mid
+        self.time = time
+        self.content = content
+        self.sender = Sender(name, sid, serv_id, serv_era, sess_id)
+
+class Message:
+    def __init__(self, packet):
+        self.type = packet['type']
+        data = packet['data']
+        self.data = DataStruct(data['id'], data['time'], data['content'], data['sender']['id'], data['sender']['id'], data['sender']['server_id'], data['sender']['server_id'], data['sender']['session_id'])
+
+class newBot:
     """newBot represents a single bot for euphoria.io
 
     A single bot is the simplest object which Karelia supports. Simply speaking,
