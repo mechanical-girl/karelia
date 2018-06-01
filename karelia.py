@@ -8,6 +8,7 @@ platform at euphoria.io
 from websocket import create_connection
 import websocket
 import traceback
+import random
 import json
 import time
 import sys
@@ -62,7 +63,7 @@ class newBot:
             self.names = [name]
         self.stockResponses = {'ping': 'Pong!',
                                'shortHelp': '',
-                               'longHelp': [],
+                               'longHelp': [''],
                                'paused': '/me has been paused',
                                'unpaused': '/me has been unpaused',
                                'killed': '/me has been killed'}
@@ -208,7 +209,7 @@ class newBot:
                                                'data': {
                                                    'time': packet['data']['time']}}))
 
-                elif packet['type'] == "send-event" and packet['data']['content'][0] == '!':
+                elif packet['type'] == "send-event" and len(packet['data']['content'] > 0 and packet['data']['content'][0] == '!':
 
                     if packet['data']['content'] == '!ping':
                         self.send(self.stockResponses['ping'], packet['data']['id'])
@@ -245,7 +246,6 @@ class newBot:
                                 self.stockResponses['longHelp'] = [
                                     self.stockResponses['longHelp']]
                             for message in self.stockResponses['longHelp']:
-
                                 sending = message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
@@ -270,9 +270,6 @@ class newBot:
         """
         logs as much information as possible to an external file.
         """
-        message = None
-        if 'message' in kwargs:
-            message = kwargs['message']
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
         if not hasattr(self, 'packet'):
@@ -286,3 +283,68 @@ class newBot:
 
         with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
             f.write(logText)
+
+
+class Botling:
+    def __init__(self):
+        pass
+
+    def parse_botbot_command(self, command):
+        escape = '\\'
+        delim = ';'
+    
+        ret = []
+        current = []
+    
+        itr = iter(command)
+        for ch in itr:
+            if ch == escape:
+                try:
+                    # skip the next character; it has been escaped!
+                    current.append(next(itr))
+                except:
+                    pass
+            elif ch == delim:
+                # split! (add current to the list and reset it)
+                ret.append(''.join(current))
+                current = []
+            else:
+                current.append(ch)
+        ret.append(''.join(current))
+        return ret
+    
+    def construct(self):
+        self.bot = self.newBot(self.nick, self.room)
+        self.raw_commands = self.parse_botbot_command(self.regex)
+        self.commands = {}
+        for command in self.raw_commands:
+            trigger, response = command.split('->', 1)
+            self.commands[trigger] = response
+
+    def connect(self):
+        self.bot.connect()
+
+    def disconnect(self):
+        self.bot.disconnect()
+
+    def choose_random_options(self, options):
+        # Recursively check for random options and pick one
+        if type(options) == 'list':
+            return options[random.randint(0, len(options)-1)]
+        if '[' in options and ']' in options:
+            left, options = options.split('[',1)
+            options, right = options.split(']',-1)
+            return "{}{}{}".format(left, self.choose_random_options(options), right)
+
+    def compile_reply(self, reply_text):
+      return(self.choose_random_options(reply_text)) 
+
+    def check(self, message)
+        for trigger in list(self.commands.keys()):
+            if re.match(trigger, message['data']['content']):
+                self.bot.send(self.compile_reply(self.commands[trigger]), message['data']['id'])
+    
+    def parse(self):
+        message = self.bot.parse()
+        if not message['type'] == 'send-event': return
+        self.check(message)
