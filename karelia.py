@@ -209,7 +209,7 @@ class newBot:
                                                'data': {
                                                    'time': packet['data']['time']}}))
 
-                elif packet['type'] == "send-event" and len(packet['data']['content'] > 0 and packet['data']['content'][0] == '!':
+                elif packet['type'] == "send-event" and len(packet['data']['content']) > 0 and packet['data']['content'][0] == '!':
 
                     if packet['data']['content'] == '!ping':
                         self.send(self.stockResponses['ping'], packet['data']['id'])
@@ -339,7 +339,7 @@ class Botling:
     def compile_reply(self, reply_text):
       return(self.choose_random_options(reply_text)) 
 
-    def check(self, message)
+    def check(self, message):
         for trigger in list(self.commands.keys()):
             if re.match(trigger, message['data']['content']):
                 self.bot.send(self.compile_reply(self.commands[trigger]), message['data']['id'])
