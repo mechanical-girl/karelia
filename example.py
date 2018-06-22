@@ -6,7 +6,7 @@ def on_kill():
     print("Got killed :-(")
 
 # Initialise a bot with nick (or [nick1, nick2]) and room the bot will connect to
-bot = karelia.bot("ExampleBot", "xkcd")
+bot = karelia.bot("ExampleBot", "test")
 
 # Define response messages to the botrulez.
 bot.stock_responses['short_help'] = "Short help message"
