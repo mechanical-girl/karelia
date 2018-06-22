@@ -6,7 +6,7 @@ def on_kill():
     print("Got killed :-(")
 
 # Initialise a bot with nick (or [nick1, nick2]) and room the bot will connect to
-bot = karelia.bot("ExampleBot", "test")
+bot = karelia.bot("ExampleBot", "xkcd")
 
 # Define response messages to the botrulez.
 bot.stock_responses['short_help'] = "Short help message"
@@ -19,20 +19,18 @@ bot.on_kill = on_kill
 bot.connect()
 
 while True:
-    # Send a top-level messaage
-    bot.send("/me has connected!")
     try:
-        # Pick up a new packet from the heim servers. Note: is blocking.
-        packet = bot.parse()
+        while True:
+            message = bot.parse()
 
-        if packet.type == "send-event":
-            # Send a reply to the most recently processed message
-            bot.reply(f"Hi {packet.data.sender.name}!")
-            bot.log(event = f"Greeted {packet.data.sender.name}\n")
+            if message.type == "send-event":
+                print(f"{message.data.sender.name}: {message.data.content}")
+                if message.data.content.split()[0] == "!changenick":
+                    bot.change_nick("NewNick")
 
     except:
         bot.log()
         bot.disconnect()
     finally:
-        time.sleep(10)
+        time.sleep(1)
         bot.connect()
