@@ -245,8 +245,8 @@ class newBot:
                             if type(self.stockResponses['longHelp']) != "<class 'list'>":
                                 self.stockResponses['longHelp'] = [
                                     self.stockResponses['longHelp']]
-                            for message in self.stockResponses['longHelp']:
-                                sending = message.format(self.normaliseNick(
+                            for help_message in self.stockResponses['longHelp']:
+                                sending = help_message.format(self.normaliseNick(
                                     packet['data']['sender']['name']))
                                 self.send(sending, packet['data']['id'])
                         if command == '!kill':
@@ -270,6 +270,9 @@ class newBot:
         """
         logs as much information as possible to an external file.
         """
+
+        logfile = kwargs['logfile'] if 'logfile' in kwargs else f"{self.names[0]}_{self.room}.log" 
+
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
         if not hasattr(self, 'packet'):
@@ -281,7 +284,7 @@ class newBot:
                                                     self.packet,
                                                     tbText)
 
-        with open("{} &{}.log".format(self.names[0], self.room), 'a') as f:
+        with open(f"{logfile}", 'a') as f:
             f.write(logText)
 
 
