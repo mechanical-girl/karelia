@@ -279,7 +279,7 @@ class bot:
                             self.reply(self.stock_responses['killed'])
                             self.disconnect()
                             self.on_kill()
-                            sys.exit()
+                            sys.exit(0)
 
             return(self.packet)
 

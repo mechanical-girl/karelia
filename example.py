@@ -28,9 +28,14 @@ while True:
                 if message.data.content.split()[0] == "!changenick":
                     bot.change_nick("NewNick")
 
+    except SystemExit:
+        # Catches !kill commands to the bot and ctrl+c/equivalent
+        on_kill()
+        sys.exit(0)
     except:
+        # Catches any other exception
         bot.log()
         bot.disconnect()
     finally:
         time.sleep(1)
-        bot.connect()
+        ot.connect()
