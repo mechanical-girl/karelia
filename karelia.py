@@ -486,7 +486,7 @@ class newBot:
             if packet['type'] == "ping-event":
                 self.conn.send(json.dumps({'type': 'ping-reply',
                                            'data': {
-                                               'time': self['packet']['data']['time']}}))
+                                               'time': packet['data']['time']}}))
 
             elif packet['type'] == "send-event" and len(packet['data']['content']) > 0 and packet['data']['content'][0] == '!':
 
