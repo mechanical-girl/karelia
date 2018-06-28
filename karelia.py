@@ -553,7 +553,7 @@ class newBot:
         if not hasattr(self, 'packet'):
             self.packet = {}
         
-        if logText = "":
+        if logText == "":
             tbText = traceback.format_exc()
             logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
                                                         "Exception on message",
