@@ -510,13 +510,9 @@ class newBot:
                     if command == '!pause':
                         self.send(self.stockResponses['paused'], packet['data']['id'])
                         self.paused = True
-                        self.log('{} PauseEvent from {}'.format(time.strftime(
-                            "%a, %d %b %Y %H:%M:%S (%Z)", time.time()),
-                            packet['data']['sender']['name']))
+                        self.log('{} PauseEvent from {}'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()), packet['data']['sender']['name']))
                     if command == '!unpause':
-                        self.log('{} UnpauseEvent from {}'.format(time.strftime(
-                            "%Y-%M-%D %H:%M:%S (%Z)", time.time()),
-                            packet['data']['sender']['name']))
+                        self.log('{} UnpauseEvent from {}'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()), packet['data']['sender']['name']))
                         self.paused = False
                         self.send(self.stockResponses['unpaused'],
                                   packet['data']['id'])
