@@ -541,7 +541,7 @@ class newBot:
         """Return the known-standard form i(i.e., lowercase with no whitespace) of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
 
-    def log(self, **kwargs):
+    def log(self, logText="", **kwargs):
         """
         logs as much information as possible to an external file.
         """
@@ -553,11 +553,12 @@ class newBot:
         if not hasattr(self, 'packet'):
             self.packet = {}
         
-        tbText = traceback.format_exc()
-        logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
-                                                    "Exception on message",
-                                                    self.packet,
-                                                    tbText)
+        if logText = "":
+            tbText = traceback.format_exc()
+            logText = "{}\n{} - {}: {}:\n{}\n\n".format(delimit, currTime,
+                                                        "Exception on message",
+                                                        self.packet,
+                                                        tbText)
 
         with open(f"{logfile}", 'a') as f:
             f.write(logText)
