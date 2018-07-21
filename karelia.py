@@ -59,7 +59,7 @@ class bot:
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if type(name) == "<class 'list'>":
+        if isinstance(name, list):
             self.names = name
         else:
             self.names = [name]
@@ -166,7 +166,7 @@ class bot:
         request for the thousand most recent messages posted to the room.
         """
         if not self.paused:
-            if type(message) is dict:
+            if isinstance(message, dict):
                 if message['type'] == 'send':
                     raise MessageAsDict("Passed message with type send")
                 self.conn.send(json.dumps(message))
@@ -269,7 +269,7 @@ class bot:
                             self.paused = False
                             self.reply(self.stock_responses['unpaused'])
                         if command == '!help':
-                            if type(self.stock_responses['long_help']) != list:
+                            if isinstance(self.stock_responses['long_help']) != list:
                                 self.stock_responses['long_help'] = [self.stock_responses['long_help']]
                             for help_message in self.stock_responses['long_help']:
                                 sending = help_message.format(self.normalise_nick(
@@ -336,7 +336,7 @@ class newBot:
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if type(name) == "<class 'list'>":
+        if isinstance(name, list):
             self.names = name
         else:
             self.names = [name]
@@ -427,7 +427,7 @@ class newBot:
         request for the thousand most recent messages posted to the room.
         """
         if not self.paused:
-            if type(message) is dict:
+            if isinstance(message, dict):
                 self.conn.send(json.dumps(message))
             elif len(message) > 0:
                 self.conn.send(json.dumps({'type': 'send',
@@ -517,7 +517,7 @@ class newBot:
                         self.send(self.stockResponses['unpaused'],
                                   packet['data']['id'])
                     if command == '!help':
-                        if type(self.stockResponses['longHelp']) != "<class 'list'>":
+                        if isinstance(self.stockResponses['longHelp']):
                             self.stockResponses['longHelp'] = [
                                 self.stockResponses['longHelp']]
                         for help_message in self.stockResponses['longHelp']:
