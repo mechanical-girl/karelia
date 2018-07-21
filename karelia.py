@@ -59,7 +59,7 @@ class bot:
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if isinstance(name, list):
+        if not isinstance(name, str):
             self.names = name
         else:
             self.names = [name]
@@ -91,7 +91,7 @@ class bot:
 
         try:
             self.conn = create_connection(
-                "wss://euphoria.io/room/{}/ws".format(self.room))
+                "wss://euphoria.io/room/{}/ws?h=0".format(self.room))
         except websocket._exceptions.WebSocketBadStatusException:
             raise ConnectionError('Room not found')
 
@@ -269,7 +269,7 @@ class bot:
                             self.paused = False
                             self.reply(self.stock_responses['unpaused'])
                         if command == '!help':
-                            if isinstance(self.stock_responses['long_help']) != list:
+                            if isinstance(self.stock_responses['long_help'], str):
                                 self.stock_responses['long_help'] = [self.stock_responses['long_help']]
                             for help_message in self.stock_responses['long_help']:
                                 sending = help_message.format(self.normalise_nick(
@@ -336,7 +336,7 @@ class newBot:
 
     def __init__(self, name, room):
         """Inits the bot object"""
-        if isinstance(name, list):
+        if not isinstance(name, str):
             self.names = name
         else:
             self.names = [name]
@@ -357,7 +357,7 @@ class newBot:
     def connect(self, stealth=False):
         """Connects to specified room and sets nick."""
         self.conn = create_connection(
-            "wss://euphoria.io/room/{}/ws".format(self.room))
+            "wss://euphoria.io/room/{}/ws?h=0".format(self.room))
         if not stealth:
             self.changeNick()
         self.stealth = stealth
@@ -517,7 +517,7 @@ class newBot:
                         self.send(self.stockResponses['unpaused'],
                                   packet['data']['id'])
                     if command == '!help':
-                        if isinstance(self.stockResponses['longHelp']):
+                        if isinstance(self.stockResponses['longHelp'], str):
                             self.stockResponses['longHelp'] = [
                                 self.stockResponses['longHelp']]
                         for help_message in self.stockResponses['longHelp']:
