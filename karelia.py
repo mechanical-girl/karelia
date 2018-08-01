@@ -6,6 +6,7 @@ platform at euphoria.io
 """
 
 from websocket import create_connection
+from munch import munchify
 import websocket
 import traceback
 import random
@@ -14,34 +15,6 @@ import time
 import sys
 import os
 import re
-
-class Sender:
-    def __init__(self, data):
-        self.name = data['name']
-        self.id = data['id']
-        self.server_id = data['server_id']
-        self.server_era = data['server_era']
-        self.session_id = data['server_id']
-
-class DataStruct:
-    def __init__(self, data):
-        try: self.id = data['id']
-        except: pass
-        try: self.time = data['time']
-        except: pass
-        try: self.content = data['content']
-        except: pass
-        try: self.from_nick = data['from']
-        except: pass
-        try: self.to_nick = data['to']
-        except: pass
-        try: self.sender = Sender(data['sender'])
-        except: pass
-
-class Packet:
-    def __init__(self, packet):
-        self.type = packet['type']
-        self.data = DataStruct(packet['data'])
 
 class bot:
     """bot represents a single bot for euphoria.io
@@ -229,7 +202,7 @@ class bot:
         """
 
         incoming = self.conn.recv()
-        packet = Packet(json.loads(incoming))
+        packet = munchify(json.loads(incoming))
         if self.packet != packet:
             self.packet = packet
 

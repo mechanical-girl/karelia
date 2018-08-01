@@ -22,7 +22,7 @@ while True:
     try:
         while True:
             message = bot.parse()
-
+            print(message.type)
             if message.type == "send-event":
                 print(f"{message.data.sender.name}: {message.data.content}")
                 if message.data.content.split()[0] == "!changenick":
@@ -38,4 +38,4 @@ while True:
         bot.disconnect()
     finally:
         time.sleep(1)
-        ot.connect()
+        bot.connect()
