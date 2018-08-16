@@ -93,9 +93,13 @@ class bot:
         elif len(self.names) == 1:
             self.names = [nick]
         else:
-            self.names.remove(nick)
-            self.names.prepend(nick)
-        
+            try:
+                self.names.remove(nick)
+            except ValueError:
+                pass
+            finally:
+                self.names.prepend(nick)
+
         self.send({"type": "nick", "data": {"name": nick}})
 
     def get_uptime(self):
