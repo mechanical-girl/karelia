@@ -5,16 +5,18 @@ Karelia is a library of functions for connecting a bot to the Heim chat
 platform at euphoria.io
 """
 
-from websocket import create_connection
-from munch import munchify
-import websocket
-import traceback
-import random
 import json
-import time
-import sys
 import os
+import random
 import re
+import sys
+import time
+import traceback
+
+import websocket
+from munch import munchify
+from websocket import create_connection
+
 
 class bot:
     """bot represents a single bot for euphoria.io
@@ -98,7 +100,7 @@ class bot:
             except ValueError:
                 pass
             finally:
-                self.names.prepend(nick)
+                self.names.insert(0, nick)
 
         self.send({"type": "nick", "data": {"name": nick}})
 
@@ -539,4 +541,3 @@ class newBot:
 
         with open(f"{logfile}", 'a') as f:
             f.write(logText)
-
