@@ -1,0 +1,34 @@
+--------------------
+2018-08-23 15:35:01 - Exception on message: <karelia.Packet object at 0x120b334a8>:
+Traceback (most recent call last):
+  File "/Users/Helen/karelia/example.py", line 24, in <module>
+    message = bot.parse()
+  File "/Users/Helen/karelia/karelia.py", line 218, in parse
+    incoming = json.loads(self.conn.recv())
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_core.py", line 302, in recv
+    opcode, data = self.recv_data()
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_core.py", line 319, in recv_data
+    opcode, frame = self.recv_data_frame(control_frame)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_core.py", line 332, in recv_data_frame
+    frame = self.recv_frame()
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_core.py", line 366, in recv_frame
+    return self.frame_buffer.recv_frame()
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_abnf.py", line 361, in recv_frame
+    self.recv_header()
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_abnf.py", line 309, in recv_header
+    header = self.recv_strict(2)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_abnf.py", line 396, in recv_strict
+    bytes_ = self.recv(min(16384, shortage))
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_core.py", line 441, in _recv
+    return recv(self.sock, bufsize)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/websocket/_socket.py", line 81, in recv
+    bytes_ = sock.recv(bufsize)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/ssl.py", line 987, in recv
+    return self.read(buflen)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/ssl.py", line 865, in read
+    return self._sslobj.read(len, buffer)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/ssl.py", line 627, in read
+    v = self._sslobj.read(len)
+KeyboardInterrupt
+
+

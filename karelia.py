@@ -14,8 +14,16 @@ import time
 import traceback
 
 import websocket
-from munch import munchify
 from websocket import create_connection
+
+
+class Packet:
+    def __init__(self, **packet):
+        for k, v in packet.items():
+            if isinstance(v, dict):
+                self.__dict__[k] = Packet(**v)
+            else:
+                self.__dict__[k] = v
 
 
 class bot:
@@ -207,8 +215,10 @@ class bot:
         Note: as of 2018-06-22 if killed, it will log the killer, run `bot.on_kill()`, and then exit.
         """
 
-        incoming = self.conn.recv()
-        packet = munchify(json.loads(incoming))
+        incoming = json.loads(self.conn.recv())
+
+        packet = Packet(**incoming)
+        
         if self.packet != packet:
             self.packet = packet
 
