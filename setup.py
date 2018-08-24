@@ -4,12 +4,12 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(  name='Karelia',
-        version='2.0.7',
+        version='2.0.8',
         description='Python library for euphoria.io',
         long_description=long_description,
         long_description_content_type="text/markdown",
-        author='Pouncy Silverkitten',
-        author_email='pouncy.sk@gmail.com',
+        author='StruanDW',
+        author_email='struan@duncan-wilson.co.uk',
         url='https://github.com/pouncysilverkitten/karelia',
         classifiers=[
             "Programming Language :: Python :: 3",
