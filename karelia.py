@@ -130,7 +130,7 @@ class bot:
             self.upminutes += 1
             self.upticks -= 60
 
-        self.uptime = f"/me has been up since {self.formatted_connect_time} UTC ({self.updays} days, {self.uphours} hours, {self.upminutes} minutes)"
+        self.uptime = "/me has been up since {self.formatted_connect_time} UTC ({self.updays} days, {self.uphours} hours, {self.upminutes} minutes)".format(self.formatted_connect_time, self.updays, self.uphours, self.upminutes)
         return(self.uptime)
 
     def send(self, message, parent=''):
@@ -285,7 +285,7 @@ class bot:
         Otherwise,  logs will be written to a file with the following format: `botname_room.log`
         """
 
-        logfile = kwargs['logfile'] if 'logfile' in kwargs else f"{self.names[0]}_{self.room}.log" 
+        logfile = kwargs['logfile'] if 'logfile' in kwargs else "{}_{}.log".format(self.names[0], self.room)
 
         curr_time = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
@@ -293,11 +293,11 @@ class bot:
             self.packet = {}
         
         tbText = traceback.format_exc()
-        logText = f"{delimit}\n{curr_time} - Exception on message: {self.packet}:\n{tbText}\n\n"
+        logText = "{delimit}\n{curr_time} - Exception on message: {self.packet}:\n{tbText}\n\n".format(delimit, curr_time, self.packet, tbText)
 
         logText = kwargs['event'] if 'event' in kwargs else logText
 
-        with open(f"{logfile}", 'a') as f:
+        with open(logfile, 'a') as f:
             f.write(logText)
 
 
@@ -535,7 +535,7 @@ class newBot:
         logs as much information as possible to an external file.
         """
 
-        logfile = kwargs['logfile'] if 'logfile' in kwargs else f"{self.names[0]}_{self.room}.log" 
+        logfile = kwargs['logfile'] if 'logfile' in kwargs else "{}_{}.log".format(self.names[0], self.room)
 
         currTime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
@@ -549,5 +549,5 @@ class newBot:
                                                         self.packet,
                                                         tbText)
 
-        with open(f"{logfile}", 'a') as f:
+        with open(logfile, 'a') as f:
             f.write(logText)
