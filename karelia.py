@@ -130,7 +130,7 @@ class bot:
             self.upminutes += 1
             self.upticks -= 60
 
-        self.uptime = "/me has been up since {self.formatted_connect_time} UTC ({self.updays} days, {self.uphours} hours, {self.upminutes} minutes)".format(self.formatted_connect_time, self.updays, self.uphours, self.upminutes)
+        self.uptime = "/me has been up since {} UTC ({} days, {} hours, {} minutes)".format(self.formatted_connect_time, self.updays, self.uphours, self.upminutes)
         return(self.uptime)
 
     def send(self, message, parent=''):
@@ -292,7 +292,7 @@ class bot:
             self.packet = {}
         
         tbText = traceback.format_exc()
-        logText = "{delimit}\n{curr_time} - Exception on message: {self.packet}:\n{tbText}\n\n".format(delimit, curr_time, self.packet, tbText)
+        logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.packet, tbText)
 
         logText = kwargs['event'] if 'event' in kwargs else logText
 
