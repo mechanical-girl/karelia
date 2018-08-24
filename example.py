@@ -26,7 +26,7 @@ while True:
             if message.type == "send-event":
                 print(f"{message.data.sender.name}: {message.data.content}")
                 if message.data.content.split()[0] == "!changenick":
-                    bot.change_nick(message.data.content.split()[1][1:])
+                    bot.change_nick("NewNick")
 
     except SystemExit:
         # Catches !kill commands to the bot and ctrl+c/equivalent
