@@ -19,6 +19,7 @@ from websocket import create_connection
 
 class Packet:
     def __init__(self, **packet):
+        self.packet = packet
         for k, v in packet.items():
             if isinstance(v, dict):
                 self.__dict__[k] = Packet(**v)
@@ -289,10 +290,10 @@ class bot:
         curr_time = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
         if not hasattr(self, 'packet'):
-            self.packet = {}
+            self.packet = {packet: {}}
         
         tbText = traceback.format_exc()
-        logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.incoming, tbText)
+        logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.packet.packet, tbText)
 
         logText = kwargs['event'] if 'event' in kwargs else logText
 
