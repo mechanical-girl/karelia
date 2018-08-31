@@ -4,7 +4,7 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(  name='Karelia',
-        version='2.0.14',
+        version='2.0.15',
         description='Python library for euphoria.io',
         long_description=long_description,
         long_description_content_type="text/markdown",

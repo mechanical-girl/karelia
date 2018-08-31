@@ -292,7 +292,7 @@ class bot:
             self.packet = {}
         
         tbText = traceback.format_exc()
-        logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.packet, tbText)
+        logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.incoming, tbText)
 
         logText = kwargs['event'] if 'event' in kwargs else logText
 
