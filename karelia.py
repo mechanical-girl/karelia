@@ -289,9 +289,9 @@ class bot:
 
         curr_time = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         delimit = "-" * 20
-        if not hasattr(self, 'packet'):
-            self.packet = {'packet': {}}
- 
+        if not hasattr(self, 'packet') or self.packet == {}:
+            self.packet = Packet(**{})
+
         tbText = traceback.format_exc()
         logText = "{}\n{} - Exception on message: {}:\n{}\n\n".format(delimit, curr_time, self.packet.packet, tbText)
 
