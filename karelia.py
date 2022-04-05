@@ -66,6 +66,8 @@ class bot:
         f_format = logging.Formatter(f'--------------------\n%(asctime)s - &{self.room}: %(message)s\n\n\n', datefmt='%d-%b-%y %H:%M:%S')
         f_handler.setFormatter(f_format)
         self.logger.addHandler(f_handler)
+        self.cookie=""
+        self.logged_in = False
 
 
     def on_kill(self):
@@ -81,15 +83,13 @@ class bot:
 
         try:
             self.conn = create_connection(
-                "wss://euphoria.io/room/{}/ws?h=0".format(self.room))
+                "wss://euphoria.io/room/{}/ws?h=0".format(self.room), cookie=self.cookie)
         except websocket._exceptions.WebSocketBadStatusException:
             raise ConnectionError('Room not found')
+        self.cookie = self.conn.getheaders()["set-cookie"].split(";")[0]
 
         if not self.stealth:
             self.change_nick()
-
-        for _ in range(3):
-            self.conn.recv()
 
     def change_nick(self, nick=''):
         """ 
@@ -180,6 +180,7 @@ class bot:
     def disconnect(self):
         """Attempts to close the connection at `self.conn`. If unsuccessful, it will log and raise an Exception.""" 
         try:
+            self.send({"type": "disconnect-event"})
             self.conn.close()
         except Exception as e:
             self.logger.exception("Unable to disconnect.")
