@@ -14,12 +14,16 @@ import sys
 import time
 import traceback
 
-import websocket
+from typing import Dict, Union, Mapping
+
+import websocket #type: ignore
 from websocket import create_connection
+
+PacketType = Mapping[str, Union[str, Mapping[str, str]]]
 
 
 class Packet:
-    def __init__(self, **packet):
+    def __init__(self, **packet: PacketType):
         self.packet = packet
         for k, v in packet.items():
             if isinstance(v, dict):
@@ -41,7 +45,7 @@ class bot:
 
     """
 
-    def __init__(self, name, room):
+    def __init__(self, name: Union[str, list], room: str):
         """Inits the bot object"""
         if not isinstance(name, str):
             self.names = name
@@ -53,9 +57,9 @@ class bot:
                                'paused': '/me has been paused',
                                'unpaused': '/me has been unpaused',
                                'killed': '/me has been killed'}
-        self.packet = {}
+        self.packet: PacketType = {}
         self.room = room
-        self.paused = False
+        self.paused: bool = False
         self.connect_time = time.gmtime()
         self.formatted_connect_time = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
         websocket.enableTrace(False)
@@ -66,14 +70,14 @@ class bot:
         f_format = logging.Formatter(f'--------------------\n%(asctime)s - &{self.room}: %(message)s\n\n\n', datefmt='%d-%b-%y %H:%M:%S')
         f_handler.setFormatter(f_format)
         self.logger.addHandler(f_handler)
-        self.cookie=""
-        self.logged_in = False
+        self.cookie: str =""
+        self.logged_in: bool = False
 
 
     def on_kill(self):
-        pass
+        sys.exit(0)
 
-    def connect(self, stealth=False):
+    def connect(self, stealth: bool =False):
         """Connects to specified room and sets nick.
 
         `bot.connect()` will connect to the room and then cause the bot to appear on the nicklist.
@@ -91,7 +95,7 @@ class bot:
         if not self.stealth:
             self.change_nick()
 
-    def change_nick(self, nick=''):
+    def change_nick(self, nick: str=''):
         """ 
         `change_nick` sends the `nick` command to Heim servers.
 
@@ -140,7 +144,7 @@ class bot:
         self.uptime = "/me has been up since {} UTC ({} days, {} hours, {} minutes)".format(self.formatted_connect_time, self.updays, self.uphours, self.upminutes)
         return(self.uptime)
 
-    def send(self, message, parent=''):
+    def send(self, message: Union[str, PacketType], parent: str =''):
         """
         Unless the bot is paused, sends the supplied message. The parent message can be specified: `send(message, parent = parent_id)`.
 
@@ -161,21 +165,19 @@ class bot:
         """
         if not self.paused:
             if isinstance(message, dict):
-                if message['type'] == 'send':
-                    raise MessageAsDict("Passed message with type send")
                 self.conn.send(json.dumps(message))
             elif len(message) > 0:
                 self.conn.send(json.dumps({'type': 'send',
                                            'data': {'content': message,
                                                      'parent': parent}}))
 
-    def reply(self, message):
+    def reply(self, message: str):
         """
         Wrapper around `bot.send()`
 
         Sends the only argument as a reply to the most recently `parse()`d message.
         """ 
-        self.send(message, self.packet.data.id)
+        self.send(message, self.packet.data.id) # type: ignore
 
     def disconnect(self):
         """Attempts to close the connection at `self.conn`. If unsuccessful, it will log and raise an Exception.""" 
@@ -278,10 +280,10 @@ class bot:
                                 self.disconnect()
                                 self.on_kill()
                             finally:
-                                sys.exit(0)
+                                raise SystemExit
 
             return(self.packet)
 
-    def normalise_nick(self, nick):
+    def normalise_nick(self, nick: str):
         """Return the known-standard form (i.e., lowercase with no whitespace) of the supplied nick."""
         return(re.sub(r'\s+', '', nick.translate(self.non_bmp_map)).lower())
